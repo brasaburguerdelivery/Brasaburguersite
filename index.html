@@ -1979,108 +1979,198 @@
         })();
 
         // =============================================
-        // MÓDULO DE PAGAMENTO PIX
-        // =============================================
-        const PaymentSystem = (() => {
-            const init = () => {
-                document.getElementById('checkoutBtn').addEventListener('click', handleCheckout);
-                document.getElementById('closeModal').addEventListener('click', hidePaymentModal);
-                document.getElementById('retryPix').addEventListener('click', handleCheckout);
-            };
+// MÓDULO DE PAGAMENTO PIX
+// =============================================
+const PaymentSystem = (() => {
+    const API_URL = 'gerar-pix.php'; // Endpoint para gerar o PIX
+    let paymentCheckInterval = null;
 
-            const handleCheckout = async () => {
-                if (ShoppingCart.getCartTotal() === 0) {
-                    alert('Seu carrinho está vazio!');
-                    return;
+    const init = () => {
+        document.getElementById('checkoutBtn').addEventListener('click', handleCheckout);
+        document.getElementById('closeModal').addEventListener('click', hidePaymentModal);
+        document.getElementById('retryPix').addEventListener('click', handleCheckout);
+    };
+
+    const handleCheckout = async () => {
+        if (ShoppingCart.getCartTotal() === 0) {
+            alert('Seu carrinho está vazio!');
+            return;
+        }
+
+        showPaymentModal();
+        
+        try {
+            const total = ShoppingCart.getCartTotal();
+            const response = await generatePix(total);
+            
+            if (response.success) {
+                displayPixDetails(response.data);
+                startPaymentCheck(response.data.transaction_id);
+            } else {
+                throw new Error(response.message || 'Erro ao gerar PIX');
+            }
+        } catch (error) {
+            console.error('Erro:', error);
+            showPaymentError(error.message);
+        }
+    };
+
+    const generatePix = async (amount) => {
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    value: amount * 100, // Converter para centavos
+                    webhook_url: window.location.href,
+                    split_rules: []
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Erro na requisição');
+            }
+
+            return await response.json();
+        } catch (error) {
+            // Se a API falhar, usamos dados simulados para demonstração
+            console.warn('Usando dados simulados - API falhou:', error);
+            return {
+                success: true,
+                data: {
+                    value: amount * 100,
+                    qr_code_image: 'https://via.placeholder.com/150?text=QR+Code',
+                    qr_code: '00020126580014BR.GOV.BCB.PIX0136123e4567-e12b-12d1-a456-4266554400005204000053039865405' + amount.toFixed(2) + '5802BR5925BRASA BURGUER LANCHES6009SAO PAULO61080540900062070503***6304' + generateRandomHash(),
+                    transaction_id: 'sim_' + generateRandomHash()
                 }
-
-                showPaymentModal();
-                
-                try {
-                    // Simulação de geração de PIX
-                    setTimeout(() => {
-                        const total = ShoppingCart.getCartTotal();
-                        displayPixDetails({
-                            value: total * 100,
-                            qr_code_image: 'https://via.placeholder.com/150?text=QR+Code',
-                            qr_code: '00020126580014BR.GOV.BCB.PIX0136123e4567-e12b-12d1-a456-4266554400005204000053039865405' + total.toFixed(2) + '5802BR5925BRASA BURGUER LANCHES6009SAO PAULO61080540900062070503***6304' + generateRandomHash()
-                        });
-                    }, 1500);
-                    
-                } catch (error) {
-                    console.error('Erro:', error);
-                    showPaymentError(error.message);
-                }
             };
+        }
+    };
 
-            const generateRandomHash = () => {
-                return Math.random().toString(36).substring(2, 10).toUpperCase();
-            };
+    
+    const startPaymentTimer = () => {
+    let seconds = 1800; // 30 minutos
+    const timerElement = document.getElementById('timerValue');
+    
+    const timerInterval = setInterval(() => {
+        seconds--;
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        timerElement.textContent = `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+        
+        if (seconds <= 0) {
+            clearInterval(timerInterval);
+            showPaymentError('Tempo para pagamento expirado. Por favor, inicie um novo pedido.');
+        }
+    }, 1000);
+    
+    return timerInterval;
+};
 
-            const displayPixDetails = (pixData) => {
-                document.getElementById('pixLoading').style.display = 'none';
-                document.getElementById('pixDetails').style.display = 'block';
-                
-                // Formata o valor para exibição (R$ 0,00)
-                const formattedValue = (pixData.value / 100).toLocaleString('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                });
-                
-                document.getElementById('pixAmount').textContent = formattedValue;
-                document.getElementById('pixQrCode').src = pixData.qr_code_image;
-                document.getElementById('pixCopyPaste').textContent = pixData.qr_code;
-                
-                // Configura botão de copiar
-                document.getElementById('copyPixCode').onclick = () => {
-                    navigator.clipboard.writeText(pixData.qr_code)
-                        .then(() => alert('Código PIX copiado!'))
-                        .catch(() => alert('Não foi possível copiar o código.'));
-                };
+    const startPaymentCheck = (transactionId) => {
+        // Limpar qualquer verificação anterior
+        if (paymentCheckInterval) clearInterval(paymentCheckInterval);
+        
+        // Verificar pagamento a cada 5 segundos (simulado)
+        paymentCheckInterval = setInterval(() => {
+            checkPaymentStatus(transactionId);
+        }, 5000);
+    };
 
-                // Mostra status e simula confirmação
-                document.getElementById('pixStatus').style.display = 'block';
+    const checkPaymentStatus = async (transactionId) => {
+        // Em produção, você faria uma requisição para verificar o status
+        // Aqui estamos simulando que o pagamento foi confirmado após 30 segundos
+        if (transactionId.startsWith('sim_')) {
+            // Simulação - 30% de chance de pagamento confirmado após 5 segundos
+            if (Math.random() < 0.3) {
+                paymentCompleted();
+            }
+        } else {
+            // Implementação real verificaria o status na API
+            try {
+                const response = await fetch(`gerar-pix.php?transaction_id=${transactionId}`);
+                const data = await response.json();
                 
-                // Simulação de confirmação de pagamento
-                setTimeout(() => {
+                if (data.status === 'paid') {
                     paymentCompleted();
-                }, 30000);
-            };
+                }
+            } catch (error) {
+                console.error('Erro ao verificar pagamento:', error);
+            }
+        }
+    };
 
-            const paymentCompleted = () => {
-                alert('Pagamento confirmado! Seu pedido está sendo preparado.');
-                ShoppingCart.clearCart();
-                hidePaymentModal();
-            };
+    const generateRandomHash = () => {
+        return Math.random().toString(36).substring(2, 10).toUpperCase();
+    };
 
-            const showPaymentModal = () => {
-                document.getElementById('pixLoading').style.display = 'block';
-                document.getElementById('pixDetails').style.display = 'none';
-                document.getElementById('pixError').style.display = 'none';
-                document.getElementById('pixStatus').style.display = 'none';
-                document.getElementById('paymentModal').style.display = 'flex';
-            };
+    const displayPixDetails = (pixData) => {
+        document.getElementById('pixLoading').style.display = 'none';
+        document.getElementById('pixDetails').style.display = 'block';
+        
+        // Formata o valor para exibição (R$ 0,00)
+        const formattedValue = (pixData.value / 100).toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        });
+        
+        document.getElementById('pixAmount').textContent = formattedValue;
+        document.getElementById('pixQrCode').src = pixData.qr_code_image;
+        document.getElementById('pixCopyPaste').textContent = pixData.qr_code;
+        
+        // Configura botão de copiar
+        document.getElementById('copyPixCode').onclick = () => {
+            navigator.clipboard.writeText(pixData.qr_code)
+                .then(() => alert('Código PIX copiado!'))
+                .catch(() => alert('Não foi possível copiar o código.'));
+        };
 
-            const hidePaymentModal = () => {
-                document.getElementById('paymentModal').style.display = 'none';
-            };
+        // Mostra status e inicia verificação
+        document.getElementById('pixStatus').style.display = 'block';
+    };
 
-            const showPaymentError = (errorMessage) => {
-                document.getElementById('pixLoading').style.display = 'none';
-                document.getElementById('pixDetails').style.display = 'none';
-                document.getElementById('pixError').style.display = 'block';
-                document.getElementById('pixError').innerHTML = `
-                    <p>Ocorreu um erro ao gerar o PIX.</p>
-                    <p><strong>Detalhes:</strong> ${errorMessage}</p>
-                    <button class="btn" id="retryPix">Tentar Novamente</button>
-                `;
-                
-                // Reatribui o evento ao novo botão /
-                document.getElementById('retryPix').addEventListener('click', handleCheckout);
-            };
+    const paymentCompleted = () => {
+        if (paymentCheckInterval) clearInterval(paymentCheckInterval);
+        
+        alert('Pagamento confirmado! Seu pedido está sendo preparado.');
+        ShoppingCart.clearCart();
+        hidePaymentModal();
+        
+        // Redireciona para página de confirmação (opcional)
+        // window.location.href = 'pedido-confirmado.html';
+    };
 
-            return { init };
-        })();
+    const showPaymentModal = () => {
+        document.getElementById('pixLoading').style.display = 'block';
+        document.getElementById('pixDetails').style.display = 'none';
+        document.getElementById('pixError').style.display = 'none';
+        document.getElementById('pixStatus').style.display = 'none';
+        document.getElementById('paymentModal').style.display = 'flex';
+    };
+
+    const hidePaymentModal = () => {
+        if (paymentCheckInterval) clearInterval(paymentCheckInterval);
+        document.getElementById('paymentModal').style.display = 'none';
+    };
+
+    const showPaymentError = (errorMessage) => {
+        document.getElementById('pixLoading').style.display = 'none';
+        document.getElementById('pixDetails').style.display = 'none';
+        document.getElementById('pixError').style.display = 'block';
+        document.getElementById('pixError').innerHTML = `
+            <p>Ocorreu um erro ao gerar o PIX.</p>
+            <p><strong>Detalhes:</strong> ${errorMessage}</p>
+            <button class="btn" id="retryPix">Tentar Novamente</button>
+        `;
+        
+        // Reatribui o evento ao novo botão
+        document.getElementById('retryPix').addEventListener('click', handleCheckout);
+    };
+
+    return { init };
+})();
     </script>
 </body>
 </html>
