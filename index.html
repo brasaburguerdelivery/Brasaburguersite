@@ -829,82 +829,6 @@
             display: block;
         }
 
-        /* Modal de Seleção de Bebidas */
-        .drink-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .drink-content {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 400px;
-            position: relative;
-        }
-
-        .drink-options {
-            margin: 15px 0;
-        }
-
-        .drink-option {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.9rem;
-        }
-
-        .drink-option:hover {
-            border-color: #ba172a;
-        }
-
-        .drink-option.active {
-            border-color: #ba172a;
-            background: #fff5f5;
-        }
-
-        .drink-option i {
-            font-size: 1.2rem;
-            margin-right: 10px;
-        }
-
-        .close-drink-modal {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #333;
-        }
-
-        /* Estilo para o botão de cancelar */
-        .cancel-drink-btn {
-            background: #f5f5f5;
-            color: #333;
-            border: 1px solid #ddd;
-            margin-top: 10px;
-        }
-
-        .cancel-drink-btn:hover {
-            background: #e0e0e0;
-            transform: none;
-            box-shadow: none;
-        }
-
         /* Responsivo */
         @media (max-width: 992px) {
             .about-content,
@@ -1159,7 +1083,7 @@
                         <h3>Combo na Brasa</h3>
                         <p>Pão brioche, 2 hambúrguer 180g, queijo cheddar, bacon fatiado, molho especial + Bebida</p>
                         <p class="price">R$ 12,90</p>
-                        <button class="btn add-to-cart" data-id="1" data-name="Combo na Brasa" data-price="12.90" data-has-drink="true" data-drink-type="refri">Adicionar ao Carrinho</button>
+                        <button class="btn add-to-cart" data-id="1" data-name="Combo na Brasa" data-price="12.90" data-checkout="https://app.pushinpay.com.br/service/pay/9F67C082-6D59-4F40-8630-574657EC28C0">Adicionar ao Carrinho</button>
                     </div>
                 </div>
                 
@@ -1171,7 +1095,7 @@
                         <h3>Combo Selvagem</h3>
                         <p>2 Lanches, pão brioche, 2 hambúrguer 180g, queijo cheddar, bacon fatiado, molho especial + Batata Frita + Bebida</p>
                         <p class="price">R$ 23,90</p>
-                        <button class="btn add-to-cart" data-id="2" data-name="Combo Selvagem" data-price="23.90" data-has-drink="true" data-drink-type="refri">Adicionar ao Carrinho</button>
+                        <button class="btn add-to-cart" data-id="2" data-name="Combo Selvagem" data-price="23.90" data-checkout="https://app.pushinpay.com.br/service/pay/9f67c138-d5a2-4603-b673-8e905d0f1b30">Adicionar ao Carrinho</button>
                     </div>
                 </div>
                 
@@ -1183,7 +1107,7 @@
                         <h3>Combo Brasa Supremo</h3>
                         <p>3 Lanches, pão brioche, 3 hambúrguer 180g, queijo cheddar, bacon fatiado, molho especial</p>
                         <p class="price">R$ 49,90</p>
-                        <button class="btn add-to-cart" data-id="3" data-name="Combo Brasa Supremo" data-price="49.90">Adicionar ao Carrinho</button>
+                        <button class="btn add-to-cart" data-id="3" data-name="Combo Brasa Supremo" data-price="49.90" data-checkout="https://app.pushinpay.com.br/service/pay/9f67c1c5-4cf7-4f66-90ce-45edae1995b0">Adicionar ao Carrinho</button>
                     </div>
                 </div>                               
 
@@ -1251,16 +1175,8 @@
                 <!-- Depoimento 1 -->
                 <div class="testimonial">
                     <div class="testimonial-text">
-                        "Os hambúrgueres da Brasa Burguer são incríveis! Sempre bem preparados e chegam quentinhos. Meu delivery favorito!"
-                    </div>
-                    <div class="testimonial-author">
-                        <img src="images/pessoa1.jpg" alt="Ana Silva">
-                        <div class="author-info">
-                            <h4>Ana Silva</h4>
-                            <p>Cliente há 2 anos</p>
-                        </div>
-                    </div>
-                </div>
+                        "Os hambúrgueres da Brasa Burguer são incríveis! Sempre bem preparados e chegam quentinhos. Meu delivery favorito!
+                                    </div>
                 
                 <!-- Depoimento 2 -->
                 <div class="testimonial">
@@ -1301,7 +1217,7 @@
             <div class="contact-container">
                 <div class="contact-info">
                     <h3>Informações de Contato</h3>
-                                                            
+                                                             
                     <div class="contact-item">
                         <div class="contact-icon">
                             <i class="fas fa-phone-alt"></i>
@@ -1398,23 +1314,6 @@
         </div>
     </footer>
 
-    <!-- Modal de Seleção de Bebidas -->
-    <div class="drink-modal" id="drinkModal">
-        <div class="drink-content">
-            <span class="close-drink-modal" id="closeDrinkModal">&times;</span>
-            <h3 id="drinkModalTitle">Selecione sua bebida</h3>
-            
-            <div class="drink-options" id="drinkOptions">
-                <!-- Opções serão preenchidas dinamicamente -->
-            </div>
-            
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button class="btn" id="confirmDrink">Confirmar</button>
-                <button class="btn cancel-drink-btn" id="cancelDrink">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
     <!-- JavaScript -->
     <script>
         // =============================================
@@ -1427,7 +1326,6 @@
             HeaderEffects.init();
             LocationService.init();
             ShoppingCart.init();
-            DrinkSelection.init();
             PaymentSystem.init();
         });
 
@@ -1596,8 +1494,6 @@
         // =============================================
         const ShoppingCart = (() => {
             let cart = [];
-            let currentItem = null;
-            let selectedDrink = null;
 
             const init = () => {
                 loadCart();
@@ -1627,6 +1523,9 @@
                     document.getElementById('cartContainer').style.display = 'none';
                 });
                 
+                // Finalizar pedido
+                document.getElementById('checkoutBtn').addEventListener('click', checkout);
+                
                 // Delegar eventos para os botões "Adicionar ao Carrinho"
                 document.addEventListener('click', function(e) {
                     if (e.target.classList.contains('add-to-cart')) {
@@ -1644,27 +1543,18 @@
                 const id = btn.getAttribute('data-id');
                 const name = btn.getAttribute('data-name');
                 const price = parseFloat(btn.getAttribute('data-price'));
-                const hasDrink = btn.getAttribute('data-has-drink') === 'true';
-                const drinkType = btn.getAttribute('data-drink-type') || btn.getAttribute('data-type');
+                const checkoutUrl = btn.getAttribute('data-checkout');
 
-                if (hasDrink && drinkType) {
-                    currentItem = { id, name, price, hasDrink: true, drinkType };
-                    DrinkSelection.showModal(currentItem, drinkType);
-                } else if (drinkType) {
-                    currentItem = { id, baseName: name, basePrice: price, type: drinkType };
-                    DrinkSelection.showModal(currentItem, drinkType);
-                } else {
-                    addToCart(id, name, price);
-                }
+                addToCart(id, name, price, checkoutUrl);
             };
 
-            const addToCart = (id, name, price) => {
+            const addToCart = (id, name, price, checkoutUrl) => {
                 const existingItem = cart.find(item => item.id === id);
 
                 if (existingItem) {
                     existingItem.quantity++;
                 } else {
-                    cart.push({ id, name, price, quantity: 1 });
+                    cart.push({ id, name, price, quantity: 1, checkoutUrl });
                 }
 
                 updateCartUI();
@@ -1817,124 +1707,97 @@
                 hideCart();
             };
 
-            return { 
-                init,
-                getCartTotal,
-                clearCart,
-                currentItem,
-                selectedDrink,
-                addToCart
-            };
-        })();
-
-        // =============================================
-        // MÓDULO DE SELEÇÃO DE BEBIDAS
-        // =============================================
-        const DrinkSelection = (() => {
-            const drinkTypes = {
-                refri: [
-                    { id: 'coca', name: 'Coca-Cola Lata', price: 6.00, icon: '<i class="fas fa-wine-bottle" style="color: #ba172a;"></i>' },
-                    { id: 'guarana', name: 'Guaraná Lata', price: 6.00, icon: '<i class="fas fa-wine-bottle" style="color: #4CAF50;"></i>' },
-                    { id: 'fanta', name: 'Fanta Lata', price: 6.00, icon: '<i class="fas fa-wine-bottle" style="color: #FF9800;"></i>' },
-                    { id: 'sprite', name: 'Sprite Lata', price: 6.00, icon: '<i class="fas fa-wine-bottle" style="color: #00BCD4;"></i>' }
-                ],
-                suco: [
-                    { id: 'laranja', name: 'Suco de Laranja', price: 6.00, icon: '<i class="fas fa-glass-whiskey" style="color: #FF9800;"></i>' },
-                    { id: 'maracuja', name: 'Suco de Maracujá', price: 6.00, icon: '<i class="fas fa-glass-whiskey" style="color: #FFEB3B;"></i>' },
-                    { id: 'limao', name: 'Suco de Limão', price: 6.00, icon: '<i class="fas fa-glass-whiskey" style="color: #CDDC39;"></i>' },
-                    { id: 'abacaxi', name: 'Suco de Abacaxi', price: 6.00, icon: '<i class="fas fa-glass-whiskey" style="color: #FFC107;"></i>' }
-                ],
-                energetico: [
-                    { id: 'redbull', name: 'Red Bull 250ml', price: 8.00, icon: '<i class="fas fa-bolt" style="color: #0055A4;"></i>' },
-                    { id: 'monster', name: 'Monster Energy 250ml', price: 8.00, icon: '<i class="fas fa-bolt" style="color: #4CAF50;"></i>' },
-                    { id: 'agua', name: 'Água Mineral 500ml', price: 5.00, icon: '<i class="fas fa-tint" style="color: #2196F3;"></i>' }
-                ]
-            };
-
-            const init = () => {
-                document.getElementById('closeDrinkModal').addEventListener('click', hideModal);
-                document.getElementById('cancelDrink').addEventListener('click', hideModal);
-                document.getElementById('confirmDrink').addEventListener('click', confirmSelection);
-            };
-
-            const showModal = (item, drinkType) => {
-                document.getElementById('drinkModalTitle').textContent = getTitleForDrinkType(drinkType);
-                renderDrinkOptions(drinkType);
-                document.getElementById('drinkModal').style.display = 'flex';
-                ShoppingCart.currentItem = item;
-            };
-
-            const hideModal = () => {
-                document.getElementById('drinkModal').style.display = 'none';
-                ShoppingCart.currentItem = null;
-                ShoppingCart.selectedDrink = null;
-            };
-
-            const getTitleForDrinkType = (drinkType) => {
-                switch(drinkType) {
-                    case 'refri': return 'Selecione seu refrigerante';
-                    case 'suco': return 'Selecione seu suco';
-                    default: return 'Selecione sua bebida';
-                }
-            };
-
-            const renderDrinkOptions = (drinkType) => {
-                const drinkOptions = document.getElementById('drinkOptions');
-                drinkOptions.innerHTML = '';
-
-                drinkTypes[drinkType].forEach(drink => {
-                    const option = document.createElement('div');
-                    option.className = 'drink-option';
-                    option.dataset.id = drink.id;
-                    option.innerHTML = `
-                        <div style="width: 30px; text-align: center; margin-right: 10px;">
-                            ${drink.icon}
-                        </div>
-                        <div>
-                            <div>${drink.name}</div>
-                            <div style="font-size: 0.9rem; color: #ba172a;">R$ ${drink.price.toFixed(2)}</div>
-                        </div>
-                    `;
-                    
-                    option.addEventListener('click', () => selectDrink(option, drink));
-                    drinkOptions.appendChild(option);
-                });
-            };
-
-            const selectDrink = (optionElement, drink) => {
-                document.querySelectorAll('.drink-option').forEach(opt => {
-                    opt.classList.remove('active');
-                });
-                optionElement.classList.add('active');
-                ShoppingCart.selectedDrink = drink;
-            };
-
-            const confirmSelection = () => {
-                if (!ShoppingCart.selectedDrink) {
-                    alert('Por favor, selecione uma bebida');
+            const checkout = () => {
+                if (cart.length === 0) {
+                    alert('Seu carrinho está vazio!');
                     return;
                 }
 
-                const { currentItem, selectedDrink } = ShoppingCart;
-                
-                if (currentItem.hasDrink) {
-                    const itemName = `${currentItem.name} (${selectedDrink.name})`;
-                    ShoppingCart.addToCart(currentItem.id, itemName, currentItem.price);
+                // Redireciona para a URL de checkout do primeiro item
+                // (Neste exemplo simples, estamos usando apenas o primeiro item)
+                const checkoutUrl = cart[0].checkoutUrl;
+                if (checkoutUrl) {
+                    window.location.href = checkoutUrl;
                 } else {
-                    const uniqueId = `${currentItem.id}-${selectedDrink.id}`;
-                    ShoppingCart.addToCart(uniqueId, selectedDrink.name, selectedDrink.price);
+                    alert('URL de checkout não disponível para este item');
                 }
-
-                hideModal();
             };
 
             return { 
                 init,
-                showModal
+                getCartTotal,
+                clearCart
             };
         })();
 
-        
+        // =============================================
+        // MÓDULO DE PAGAMENTO PIX
+        // =============================================
+        const PaymentSystem = (() => {
+            const init = () => {
+                // Configura eventos para o modal de pagamento
+                document.getElementById('closeModal').addEventListener('click', closeModal);
+                document.getElementById('retryPix').addEventListener('click', retryPix);
+                document.getElementById('copyPixCode').addEventListener('click', copyPixCode);
+            };
+
+            const closeModal = () => {
+                document.getElementById('paymentModal').style.display = 'none';
+            };
+
+            const retryPix = () => {
+                document.getElementById('pixError').style.display = 'none';
+                document.getElementById('pixLoading').style.display = 'block';
+                document.getElementById('pixDetails').style.display = 'none';
+                
+                // Simula nova tentativa após 1 segundo
+                setTimeout(() => {
+                    generatePix(ShoppingCart.getCartTotal());
+                }, 1000);
+            };
+
+            const copyPixCode = () => {
+                const copyText = document.getElementById('pixCopyPaste').textContent;
+                navigator.clipboard.writeText(copyText).then(() => {
+                    alert('Código PIX copiado para a área de transferência!');
+                }).catch(err => {
+                    console.error('Erro ao copiar texto: ', err);
+                });
+            };
+
+            const generatePix = (amount) => {
+                // Simulação de geração de PIX
+                setTimeout(() => {
+                    document.getElementById('pixLoading').style.display = 'none';
+                    
+                    // Simula sucesso ou erro aleatoriamente (apenas para demonstração)
+                    const success = Math.random() > 0.2;
+                    
+                    if (success) {
+                        document.getElementById('pixAmount').textContent = `R$ ${amount.toFixed(2)}`;
+                        document.getElementById('pixCopyPaste').textContent = '00020126580014BR.GOV.BCB.PIX0136123e4567-e12b-12d1-a456-4266554400005204000053039865405' + (amount*100).toFixed(0) + '5802BR5925BRASA BURGUER LANCHES6009SAO PAULO62070503***6304' + Math.floor(1000 + Math.random() * 9000);
+                        document.getElementById('pixDetails').style.display = 'block';
+                        document.getElementById('pixStatus').style.display = 'block';
+                        
+                        // Simula confirmação de pagamento após 5 segundos
+                        setTimeout(() => {
+                            document.getElementById('pixStatus').innerHTML = '<p><i class="fas fa-check-circle" style="color: #4CAF50;"></i> Pagamento confirmado! Seu pedido está sendo preparado.</p>';
+                            ShoppingCart.clearCart();
+                            
+                            // Fecha o modal após 3 segundos
+                            setTimeout(closeModal, 3000);
+                        }, 5000);
+                    } else {
+                        document.getElementById('pixError').style.display = 'block';
+                    }
+                }, 2000);
+            };
+
+            return { 
+                init,
+                generatePix
+            };
+        })();
     </script>
 </body>
 </html>
