@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardápio Completo - Brasa Burguer</title>
+    <meta name="description" content="Cardápio completo da Brasa Burguer - Hamburgers artesanais, combos e porções">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="imagens/favicon.png" type="image/png">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Fontes -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <style>
+        /* Reset e Estilos Globais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+            line-height: 1.6;
+            background-color: #f9f9f9;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            color: #222;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        ul {
+            list-style: none;
+        }
+        
+        img {
+            max-width: 100%;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #ba172a;
+            color: white;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: #9e1424;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(186, 23, 42, 0.3);
+        }
+        
+        .section {
+            padding: 80px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: 2.5rem;
+            position: relative;
+        }
+        
+        .section-title:after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background-color: #ba172a;
+            margin: 15px auto;
+        }
+
+        /* Carrinho de Compras */
+        .cart-container {
+            position: fixed;
+            top: 120px;
+            right: 20px;
+            width: 350px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 999;
+            padding: 20px;
+            display: none;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-items {
+            margin-bottom: 15px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-quantity {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+
+        .cart-item-quantity button {
+            background: #f5f5f5;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .cart-item-quantity span {
+            margin: 0 10px;
+        }
+
+        .cart-item-remove {
+            color: #ba172a;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .cart-total {
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-align: right;
+            margin: 15px 0;
+        }
+
+        .cart-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .cart-btn {
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Modal de Pagamento */
+        .payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .payment-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .payment-methods {
+            margin: 20px 0;
+        }
+
+        .payment-method {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .payment-method:hover {
+            border-color: #ba172a;
+        }
+
+        .payment-method.active {
+            border-color: #ba172a;
+            background: #fff5f5;
+        }
+
+        .payment-method i {
+            font-size: 24px;
+            margin-right: 15px;
+            color: #ba172a;
+        }
+
+        .payment-details {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .payment-details.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .pix-code {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            margin: 15px 0;
+            border: 1px dashed #ba172a;
+        }
+
+        .pix-code img {
+            max-width: 200px;
+            margin: 10px auto;
+            display: block;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Carrinho Flutuante */
+        .cart-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #ba172a;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(186, 23, 42, 0.4);
+            z-index: 99;
+        }
+
+        .cart-float i {
+            font-size: 1.5rem;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: white;
+            color: #ba172a;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        
+        /* Header */
+        header {
+            background-color: #ba172a;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            height: 120px;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            position: relative;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 100px;
+            width: auto;
+            transition: opacity 0.3s;
+        }
+
+        .logo img:hover {
+            opacity: 0.8;
+        }
+        
+        .logo-text {
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-left: 7px;
+        }
+        
+        /* Navegação Principal */
+        #main-nav ul {
+            display: flex;
+        }
+        
+        #main-nav ul li {
+            margin-left: 30px;
+        }
+
+        #main-nav ul li a {
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s;
+            padding: 5px 0;
+            position: relative;
+        }
+
+        #main-nav ul li a:hover {
+            color: #FFD700;
+        }
+
+        #main-nav ul li a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: #FFD700;
+            bottom: 0;
+            left: 0;
+            transition: width 0.3s;
+        }
+
+        #main-nav ul li a:hover:after {
+            width: 100%;
+        }
+        
+        /* Menu Mobile */
+        .mobile-menu {
+            display: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: white;
+            z-index: 1001;
+            padding: 10px;
+        }
+
+        .no-scroll {
+            overflow: hidden;
+        }
+
+        /* Cardápio */
+        .menu-categories {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .menu-categories button {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .menu-categories button.active,
+        .menu-categories button:hover {
+            color: #ba172a;
+            border-bottom: 3px solid #ba172a;
+        }
+        
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        
+        .menu-item {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .menu-item:hover {
+            transform: translateY(-10px);
+        }
+        
+        .menu-item-img {
+            height: 250px;
+            overflow: hidden;
+        }
+        
+        .menu-item-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .menu-item:hover .menu-item-img img {
+            transform: scale(1.1);
+        }
+        
+        .menu-item-content {
+            padding: 20px;
+        }
+        
+        .menu-item-content h3 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+            color: #ba172a;
+        }
+        
+        .menu-item-content p {
+            margin-bottom: 15px;
+            color: #666;
+        }
+        
+        .price {
+            font-weight: 700;
+            color: #ba172a;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .menu-section {
+            margin-bottom: 60px;
+        }
+        
+        .menu-section-title {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: #ba172a;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .menu-section-title:after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background-color: #ba172a;
+            margin: 15px auto 0;
+        }
+
+        /* Modal de Seleção de Bebidas */
+        .drink-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .drink-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .drink-options {
+            margin: 15px 0;
+        }
+
+        .drink-option {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .drink-option:hover {
+            border-color: #ba172a;
+        }
+
+        .drink-option.active {
+            border-color: #ba172a;
+            background: #fff5f5;
+        }
+
+        .drink-option i {
+            font-size: 1.2rem;
+            margin-right: 10px;
+        }
+
+        .close-drink-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        /* Estilo para o botão de cancelar */
+        .cancel-drink-btn {
+            background: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+            margin-top: 10px;
+        }
+
+        .cancel-drink-btn:hover {
+            background: #e0e0e0;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: #222;
+            color: white;
+            padding: 60px 0 20px;
+        }
+        
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-logo {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #ba172a;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .footer-logo span {
+            color: white;
+        }
+        
+        .footer-about p {
+            margin-bottom: 20px;
+            color: #bbb;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: #333;
+            border-radius: 50%;
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        .social-links a:hover {
+            background-color: #ba172a;
+            transform: translateY(-3px);
+        }
+        
+        .footer-links h3 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        
+        .footer-links ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links ul li a {
+            color: #bbb;
+            transition: color 0.3s;
+        }
+        
+        .footer-links ul li a:hover {
+            color: #ba172a;
+        }
+        
+        .footer-subscribe p {
+            color: #bbb;
+            margin-bottom: 20px;
+        }
+        
+        .subscribe-form {
+            display: flex;
+        }
+        
+        .subscribe-form input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .subscribe-form button {
+            padding: 0 20px;
+            background-color: #ba172a;
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .subscribe-form button:hover {
+            background-color: #9e1424;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsivo */
+        @media (max-width: 992px) {
+            .menu-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+
+            .cart-container {
+                width: 300px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu {
+                display: block;
+            }
+            
+            #main-nav {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 80%;
+                height: 100vh;
+                background-color: #ba172a;
+                padding: 100px 30px 30px;
+                transition: left 0.3s ease;
+                z-index: 999;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            }
+            
+            #main-nav.active {
+                left: 0;
+            }
+            
+            #main-nav ul {
+                flex-direction: column;
+            }
+            
+            #main-nav ul li {
+                margin: 15px 0;
+            }
+            
+            #main-nav ul li a {
+                font-size: 1.2rem;
+                padding: 10px 0;
+                display: block;
+            }
+
+            .logo img {
+                height: 100px;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .menu-categories {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .menu-categories button {
+                margin: 5px;
+                padding: 8px 15px;
+            }
+
+            .cart-container {
+                width: 90%;
+                right: 5%;
+                top: 140px;
+            }
+
+            .payment-content {
+                width: 95%;
+                padding: 20px 15px;
+            }
+
+            .drink-content {
+                width: 95%;
+                padding: 15px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .section {
+                padding: 60px 0;
+            }
+
+            .logo img {
+                height: 100px;
+            }
+            
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .menu-item-img {
+                height: 200px;
+            }
+
+            .cart-float {
+                width: 50px;
+                height: 50px;
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="index.html" class="logo">
+                <img src="images/logo.png" alt="Brasa Burguer">
+                <span class="logo-text">Brasa Burguer</span>
+            </a>
+            
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="#hamburgers">Cardápio</a></li>
+                    <li><a href="index.html#about">Sobre</a></li>
+                    <li><a href="index.html#how-it-works">Como Funciona</a></li>
+                    <li><a href="index.html#contact">Contato</a></li>
+                </ul>
+            </nav>
+            
+            <div class="mobile-menu" id="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Carrinho de Compras -->
+    <div class="cart-container" id="cartContainer">
+        <div class="cart-header">
+            <h3>Seu Carrinho</h3>
+            <span class="close-cart" id="closeCart">&times;</span>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <!-- Itens do carrinho serão adicionados aqui dinamicamente -->
+        </div>
+        <div class="cart-total">
+            Total: <span id="cartTotal">R$ 0,00</span>
+        </div>
+        <div class="cart-actions">
+            <button class="btn cart-btn" id="checkoutBtn">Finalizar Pedido</button>
+            <button class="btn cart-btn" style="background: #666;">Continuar Comprando</button>
+        </div>
+    </div>
+
+    <!-- Carrinho Flutuante -->
+    <div class="cart-float" id="cartFloat">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge" id="cartBadge">0</span>
+    </div>
+
+    <!-- Modal de Pagamento -->
+    <div class="payment-modal" id="paymentModal">
+        <div class="payment-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <h2>Finalizar Pedido</h2>
+            
+            <div class="payment-methods">
+                <div class="payment-method active" data-method="pix">
+                    <i class="fas fa-qrcode"></i>
+                    <div>
+                        <h4>PIX</h4>
+                        <p>Pagamento instantâneo com 5% de desconto</p>
+                    </div>
+                </div>
+                
+                <div class="payment-method" data-method="credit">
+                    <i class="far fa-credit-card"></i>
+                    <div>
+                        <h4>Cartão de Crédito</h4>
+                        <p>Parcelamento em até 12x</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="payment-details active" id="pixDetails">
+                <h3>Pagamento via PIX</h3>
+                <p>Você ganhou 5% de desconto! O QR Code abaixo é válido por 30 minutos.</p>
+                
+                <div class="pix-code">
+                    <p>Valor: <strong id="pixAmount">R$ 0,00</strong></p>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=PIXBRASABURGUER123456" alt="QR Code PIX">
+                    <p>Ou copie o código:</p>
+                    <p><strong>00020126360014BR.GOV.BCB.PIX0114+551198785462052040000530398654045.005802BR5925BRASA BURGUER LTDA6009SAO PAULO61080540900062250521qrcodespixbrasaburguer6304E0A5</strong></p>
+                </div>
+                
+                <p>Após o pagamento, seu pedido será processado automaticamente.</p>
+                <button class="btn" id="confirmPix">Já paguei o PIX</button>
+            </div>
+            
+            <div class="payment-details" id="creditDetails">
+                <h3>Cartão de Crédito</h3>
+                
+                <div class="form-group">
+                    <label for="cardNumber">Número do Cartão</label>
+                    <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cardName">Nome no Cartão</label>
+                    <input type="text" id="cardName" placeholder="Como consta no cartão">
+                </div>
+                
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="cardExpiry">Validade</label>
+                        <input type="text" id="cardExpiry" placeholder="MM/AA">
+                    </div>
+                    
+                    <div class="form-group" style="flex: 1;">
+                        <label for="cardCvv">CVV</label>
+                        <input type="text" id="cardCvv" placeholder="000">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cardParcels">Parcelamento</label>
+                    <select id="cardParcels" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="1">1x de R$ 0,00 sem juros</option>
+                    </select>
+                </div>
+                
+                <button class="btn" id="confirmCredit">Pagar com Cartão</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Seleção de Bebidas -->
+    <div class="drink-modal" id="drinkModal">
+        <div class="drink-content">
+            <span class="close-drink-modal" id="closeDrinkModal">&times;</span>
+            <h3 id="drinkModalTitle">Selecione sua bebida</h3>
+            
+            <div class="drink-options" id="drinkOptions">
+                <!-- Opções serão preenchidas dinamicamente -->
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn" id="confirmDrink">Confirmar</button>
+                <button class="btn cancel-drink-btn" id="cancelDrink">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('images/banner-cardapio.jpg'); background-size: cover; background-position: center; padding: 150px 0 80px; margin-top: 80px;">
+        <div class="container">
+            <h1>Cardápio Completo</h1>
+            <p>Conheça nossos hambúrgueres artesanais feitos com ingredientes selecionados</p>
+        </div>
+    </section>
+
+    <!-- Cardápio -->
+    <section class="section" id="hamburgers">
+        <div class="container">
+            <div class="menu-categories">
+                <button class="active" data-category="hamburgers">Hambúrgueres</button>
+                <button data-category="combos">Combos</button>
+                <button data-category="portions">Porções</button>
+                <button data-category="drinks">Bebidas</button>
+            </div>
+            
+            <div class="menu-section">
+                <h2 class="menu-section-title">Hambúrgueres Artesanais</h2>
+                
+                <div class="menu-grid">
+                    <!-- Hamburguer 1 -->
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            <img src="images/1.png" alt="BrasaBurguersBrigadeiro">
+                        </div>
+                        <div class="menu-item-content">
+                            <h3>1. Brasa Brigadeiro</h3>
+                            <p>Pão de cacau com brigadeiro cremoso, morangos e granulado.</p>
+                            <span class="price">R$ 18,90</span>
+                            <button class="btn add-to-cart" data-id="1" data-name="Brasa Brigadeiro" data-price="18.90">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Hamburguer 2 -->
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            <img src="images/2.png" alt="BrasaBurguersCheddar">
+                        </div>
+                        <div class="menu-item-content">
+                            <h3>2. Brasa Cheddar</h3>
+                            <p>Hambúrguer de cento e sessenta gramas, cheddar cremoso e cebola caramelizada no pão australiano.</p>
+                            <span class="price">R$ 22,90</span>
+                            <button class="btn add-to-cart" data-id="2" data-name="Brasa Cheddar" data-price="22.90">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Hamburguer 3 -->
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            <img src="images/3.png" alt="BrasaBurguersChespyBacon">
+                        </div>
+                        <div class="menu-item-content">
+                            <h3>3. Brasa Chespy Bacon</h3>
+                            <p>Hambúrguer de cento e sessenta gramas, queijo cheddar, bacon crocante, cebola crispy e maionese especial no pão brioche.</p>
+                            <span class="price">R$ 21,90</span>
+                            <button class="btn add-to-cart" data-id="3" data-name="Brasa Chespy Bacon" data-price="21.90">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Hamburguer 4 -->
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            <img src="images/4.png" alt="BrasaBurguersGorgonzolaMelt">
+                        </div>
+                        <div class="menu-item-content">
+                            <h3>4. Brasa Gorgonzola Melt</h3>
+                            <p>Hambúrguer de cento e sessenta gramas, gorgonzola derretido, cebola caramelizada e rúcula.</p>
+                            <span class="price">R$ 20,90</span>
+                            <button class="btn add-to-cart" data-id="4" data-name="Brasa Gorgonzola Melt" data-price="20.90">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Hamburguer 5 -->
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            <img src="images/5.png" alt="BrasaBurguersModaDaCasa">
+                        </div>
+                        <div class="menu-item-content">
+                            <h3>5. Brasa Moda Da Casa</h3>
+                            <p>Pão integral, hambúrguer de grão-de-bico 150g, queijo vegano, alface, tomate, cebola roxa e molho de ervas</p>
+                            <span class="price">R$ 19,90</span>
+                            <button class="btn add-to-cart" data-id="5" data-name="Brasa Moda Da Casa" data-price="19.90">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Hamburguer 6 -->
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            <img src="images/6.png" alt="BrasaBurguersPicanha">
+                        </div>
+                        <div class="menu-item-content">
+                            <h3>6. Brasa Picanha</h3>
+                            <p>Hambúrguer de picanha de cento e oitenta gramas, queijo prato, alface, tomate e maionese de alho.</p>
+                            <span class="price">R$ 19,90</span>
+                            <button class="btn add-to-cart" data-id="6" data-name="Brasa Picanha" data-price="19.90">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Hamburguer 7 -->
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            <img src="images/7.png" alt="BrasaBurguersSalada">
+                        </div>
+                        <div class="menu-item-content">
+                            <h3>7. Brasa Salada</h3>
+                            <p>Hambúrguer de cento e sessenta gramas, queijo prato, alface, tomate e maionese de ervas.</p>
+                            <span class="price">R$ 26,90</span>
+                            <button class="btn add-to-cart" data-id="7" data-name="Brasa Salada" data-price="26.90">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Hamburguer 8 -->
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            <img src="images/8.png" alt="BrasaBurguersTripleBacon">
+                        </div>
+                        <div class="menu-item-content">
+                            <h3>8. Brasa Triple Bacon</h3>
+                            <p>Hambúrguer de cento e oitenta gramas, queijo cheddar, bacon em tiras, farofa de bacon e maionese defumada no pão brioche.</p>
+                            <span class="price">R$ 22,90</span>
+                            <button class="btn add-to-cart" data-id="8" data-name="Brasa Triple Bacon" data-price="22.90">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Hamburguer 9 -->
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            <img src="images/9.png" alt="DoubleBaconSmash">
+                        </div>
+                        <div class="menu-item-content">
+                            <h3>9. Double Bacon Smash</h3>
+                            <p>Dois hambúrgueres smash, cheddar duplo, bacon crocante e maionese artesanal no pão smash.</p>
+                            <span class="price">R$ 24,90</span>
+                            <button class="btn add-to-cart" data-id="9" data-name="Double Bacon Smash" data-price="24.90">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="menu-section" id="combos">
+                <h2 class="menu-section-title">Combos Especiais</h2>
+                
+                <div class="menu-grid">
+                    <!-- Combo 1 -->
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            <img src="images/combo-1.png" alt="Combo na Brasa">
+                        </div>
+                        <div class="menu-item-content">
+                            <h3>Combo na Brasa</h3>
+                            <p>1 Brasa Clássico + Batata frita média + Refrigerante lata</p>
+                            <span class="price">R$ 32,90</span>
+                            <button class="btn add-to-cart" data-id="10" data-name="Combo na Brasa" data-price="32.90">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Combo 2 -->
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            <img src="images/combo-2.png" alt="Combo Selvagem">
+                        </div>
+                        <div class="menu-item-content">
+                            <h3>Combo Selvagem</h3>
+                            <p>1 Brasa Duplo + Batata frita grande + Refrigerante 600ml</p>
+                            <span class="price">R$ 39,90</span>
+                            <button class="btn add-to-cart" data-id="11" data-name="Combo Selvagem" data-price="39.90">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Combo 3 -->
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            <img src="images/combo-3.png" alt="Combo Família">
+                        </div>
+                        <div class="menu-item-content">
+                            <h3>Combo Família</h3>
+                            <p>2 Hamburgueres à escolha + Batata frita grande + 2 Refrigerantes 600ml</p>
+                            <span class="price">R$ 59,90</span>
+                            <button class="btn add-to-cart" data-id="12" data-name="Combo Família" data-price="59.90">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="menu-section" id="portions">
+                <h2 class="menu-section-title">Porções</h2>
+                
+                <div class="menu-grid">
+                    <!-- Porção 1 -->
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            <img src="images/porcao-1.png" alt="Batata Frita">
+                        </div>
+                        <div class="menu-item-content">
+                            <h3>Batata Frita</h3>
+                            <p>Porção de batata frita crocante com cheddar e bacon (serve 2 pessoas)</p>
+                            <span class="price">R$ 18,90</span>
+                            <button class="btn add-to-cart" data-id="13" data-name="Batata Frita" data-price="18.90">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Porção 2 -->
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            <img src="images/porcao-2.png" alt="Onion Rings">
+                        </div>
+                        <div class="menu-item-content">
+                            <h3>Onion Rings</h3>
+                            <p>Anéis de cebola empanados e crocantes (serve 2 pessoas)</p>
+                            <span class="price">R$ 16,90</span>
+                            <button class="btn add-to-cart" data-id="14" data-name="Onion Rings" data-price="16.90">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Porção 3 -->
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            <img src="images/porcao-3.png" alt="Isca de Frango">
+                        </div>
+                        <div class="menu-item-content">
+                            <h3>Isca de Frango</h3>
+                            <p>Tiras de peito de frango empanadas e crocantes (serve 2 pessoas)</p>
+                            <span class="price">R$ 22,90</span>
+                            <button class="btn add-to-cart" data-id="15" data-name="Isca de Frango" data-price="22.90">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="menu-section" id="drinks">
+                <h2 class="menu-section-title">Bebidas</h2>
+                
+                <div class="menu-grid">
+                    <!-- Bebida 1 - Refrigerantes -->
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            <img src="images/bebida-1.png" alt="Refrigerantes">
+                        </div>
+                        <div class="menu-item-content">
+                            <h3>Refrigerantes</h3>
+                            <p>Refrigerante em lata 350ml - diversas opções</p>
+                            <span class="price">R$ 6,90</span>
+                            <button class="btn add-to-cart" data-id="refris" data-name="Refrigerante" data-price="6.90" data-type="refri">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Bebida 2 - Sucos Naturais -->
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            <img src="images/bebida-2.png" alt="Sucos Naturais">
+                        </div>
+                        <div class="menu-item-content">
+                            <h3>Sucos Naturais</h3>
+                            <p>Suco natural feito na hora com frutas frescas (500ml)</p>
+                            <span class="price">R$ 8,90</span>
+                            <button class="btn add-to-cart" data-id="sucos" data-name="Suco Natural" data-price="8.90" data-type="suco">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Bebida 3 - Água e Energéticos -->
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            <img src="images/bebida-3.png" alt="Água e Energéticos">
+                        </div>
+                        <div class="menu-item-content">
+                            <h3>Água e Energéticos</h3>
+                            <p>Água mineral ou energético para acompanhar seu lanche</p>
+                            <span class="price">Água 500ml: R$ 4,90 | Energético 250ml: R$ 12,90</span>
+                            <button class="btn add-to-cart" data-id="aguas" data-name="Água/Energético" data-price="4.90" data-type="energetico">Adicionar ao Carrinho</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-about">
+                    <a href="index.html" class="footer-logo">Brasa<span>Burguer</span></a>
+                    <p>Levando sabor e praticidade para sua casa desde 2015. A melhor experiência em delivery de comida.</p>
+                    
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Links Úteis</h3>
+                    <ul>
+                        <li><a href="index.html">Início</a></li>
+                        <li><a href="#hamburgers">Cardápio</a></li>
+                        <li><a href="index.html#about">Sobre Nós</a></li>
+                        <li><a href="index.html#how-it-works">Como Funciona</a></li>
+                        <li><a href="index.html#contact">Contato</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Políticas</h3>
+                    <ul>
+                        <li><a href="#">Termos de Uso</a></li>
+                        <li><a href="#">Política de Privacidade</a></li>
+                        <li><a href="#">Política de Entrega</a></li>
+                        <li><a href="#">Trocas e Devoluções</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-subscribe">
+                    <h3>Newsletter</h3>
+                    <p>Assine nossa newsletter e receba ofertas exclusivas no seu e-mail.</p>
+                    
+                    <form class="subscribe-form">
+                        <input type="email" placeholder="Seu e-mail">
+                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 Brasa Burguer. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Font Awesome (ícones) -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    
+    <!-- JavaScript -->
+    <script>
+        // Menu Mobile
+        document.getElementById('mobile-menu').addEventListener('click', function() {
+            const nav = document.getElementById('main-nav');
+            nav.classList.toggle('active');
+            document.body.classList.toggle('no-scroll');
+        });
+
+        // Fechar menu ao clicar em um link
+        const navLinks = document.querySelectorAll('#main-nav ul li a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                document.getElementById('main-nav').classList.remove('active');
+                document.body.classList.remove('no-scroll');
+            });
+        });
+        
+        // Scroll suave para links internos
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Filtro de categorias
+        const categoryButtons = document.querySelectorAll('.menu-categories button');
+        const menuSections = document.querySelectorAll('.menu-section');
+        
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                categoryButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Get category to show
+                const category = this.getAttribute('data-category');
+                
+                // Show/hide sections
+                menuSections.forEach(section => {
+                    if (section.id === category || category === 'hamburgers') {
+                        section.style.display = 'block';
+                    } else {
+                        section.style.display = 'none';
+                    }
+                });
+            });
+        });
+        
+        // Efeito de scroll no header
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+            } else {
+                header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+            }
+        });
+
+        // Sistema de Carrinho de Compras
+        let cart = [];
+        const cartContainer = document.getElementById('cartContainer');
+        const cartItems = document.getElementById('cartItems');
+        const cartTotal = document.getElementById('cartTotal');
+        const cartBadge = document.getElementById('cartBadge');
+        const cartFloat = document.getElementById('cartFloat');
+        const closeCart = document.getElementById('closeCart');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        const paymentModal = document.getElementById('paymentModal');
+        const closeModal = document.getElementById('closeModal');
+        const pixAmount = document.getElementById('pixAmount');
+        const confirmPix = document.getElementById('confirmPix');
+        const confirmCredit = document.getElementById('confirmCredit');
+        const cardParcels = document.getElementById('cardParcels');
+
+        // Modal de Seleção de Bebidas
+        const drinkModal = document.getElementById('drinkModal');
+        const closeDrinkModal = document.getElementById('closeDrinkModal');
+        const drinkModalTitle = document.getElementById('drinkModalTitle');
+        const drinkOptions = document.getElementById('drinkOptions');
+        const confirmDrink = document.getElementById('confirmDrink');
+        const cancelDrink = document.getElementById('cancelDrink');
+        
+        let currentItem = null;
+        let selectedDrink = null;
+
+        // Opções de bebidas com preços específicos
+        const drinkTypes = {
+            refri: [
+                { id: 'coca', name: 'Coca-Cola Lata', price: 6.90, icon: '<i class="fas fa-wine-bottle" style="color: #ba172a;"></i>' },
+                { id: 'guarana', name: 'Guaraná Lata', price: 6.90, icon: '<i class="fas fa-wine-bottle" style="color: #4CAF50;"></i>' },
+                { id: 'fanta', name: 'Fanta Lata', price: 6.90, icon: '<i class="fas fa-wine-bottle" style="color: #FF9800;"></i>' },
+                { id: 'sprite', name: 'Sprite Lata', price: 6.90, icon: '<i class="fas fa-wine-bottle" style="color: #00BCD4;"></i>' },                
+            ],
+            suco: [
+                { id: 'laranja', name: 'Suco de Laranja 500ml', price: 8.90, icon: '<i class="fas fa-glass-whiskey" style="color: #FF9800;"></i>' },
+                { id: 'maracuja', name: 'Suco de Maracujá 500ml', price: 8.90, icon: '<i class="fas fa-glass-whiskey" style="color: #FFEB3B;"></i>' },
+                { id: 'limao', name: 'Suco de Limão 500ml', price: 8.90, icon: '<i class="fas fa-glass-whiskey" style="color: #CDDC39;"></i>' },
+                { id: 'abacaxi', name: 'Suco de Abacaxi 500ml', price: 8.90, icon: '<i class="fas fa-glass-whiskey" style="color: #FFC107;"></i>' }
+            ],
+            energetico: [
+                { id: 'redbull', name: 'Red Bull 250ml', price: 12.90, icon: '<i class="fas fa-bolt" style="color: #0055A4;"></i>' },
+                { id: 'monster', name: 'Monster Energy 250ml', price: 12.90, icon: '<i class="fas fa-bolt" style="color: #4CAF50;"></i>' },
+                { id: 'agua', name: 'Água Mineral 500ml', price: 4.90, icon: '<i class="fas fa-tint" style="color: #2196F3;"></i>' }
+            ]
+        };
+
+        // Sincronizar carrinho ao carregar a página
+        function syncCartOnPageLoad() {
+            const savedCart = localStorage.getItem('cart');
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+                updateCart();
+                if (cart.length > 0) {
+                    cartBadge.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+                }
+            }
+        }
+
+        // Sincronizar entre abas/páginas
+        window.addEventListener('storage', function(event) {
+            if (event.key === 'cart') {
+                const updatedCart = JSON.parse(event.newValue);
+                cart = updatedCart;
+                updateCart();
+            }
+        });
+
+        // Inicializar carrinho
+        window.addEventListener('DOMContentLoaded', syncCartOnPageLoad);
+
+        // Botões "Adicionar ao Carrinho"
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const name = this.getAttribute('data-name');
+                const price = parseFloat(this.getAttribute('data-price'));
+                const type = this.getAttribute('data-type');
+                
+                if (type) {
+                    // Se for uma bebida, mostra o modal de seleção
+                    currentItem = { 
+                        id: id, 
+                        baseName: name,
+                        basePrice: price,
+                        type: type 
+                    };
+                    showDrinkModal(currentItem, type);
+                } else {
+                    // Se não for bebida, adiciona diretamente ao carrinho
+                    addToCart(id, name, price);
+                }
+            });
+        });
+
+        // Mostrar modal de bebidas
+        function showDrinkModal(item, drinkType) {
+            currentItem = item;
+            drinkModalTitle.textContent = drinkType === 'refri' ? 'Selecione seu refrigerante' : 
+                                        drinkType === 'suco' ? 'Selecione seu suco' : 
+                                        'Selecione sua bebida';
+            drinkOptions.innerHTML = '';
+            
+            const drinks = drinkTypes[drinkType];
+            drinks.forEach(drink => {
+                const option = document.createElement('div');
+                option.className = 'drink-option';
+                option.dataset.id = drink.id;
+                option.innerHTML = `
+                    <div style="width: 30px; text-align: center; margin-right: 10px;">
+                        ${drink.icon}
+                    </div>
+                    <div>
+                        <div>${drink.name}</div>
+                        <div style="font-size: 0.9rem; color: #ba172a;">R$ ${drink.price.toFixed(2)}</div>
+                    </div>
+                `;
+                
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.drink-option').forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    selectedDrink = drink;
+                });
+                
+                drinkOptions.appendChild(option);
+            });
+            
+            drinkModal.style.display = 'flex';
+        }
+
+        // Fechar modal de bebidas
+        closeDrinkModal.addEventListener('click', function() {
+            drinkModal.style.display = 'none';
+            selectedDrink = null;
+            currentItem = null;
+        });
+
+        // Botão Cancelar
+        cancelDrink.addEventListener('click', function() {
+            drinkModal.style.display = 'none';
+            selectedDrink = null;
+            currentItem = null;
+        });
+
+        // Confirmar seleção de bebida
+        confirmDrink.addEventListener('click', function() {
+            if (!selectedDrink) {
+                alert('Por favor, selecione uma bebida');
+                return;
+            }
+            
+            // Cria um ID único combinando o ID base com o ID da bebida
+            const uniqueId = `${currentItem.id}-${selectedDrink.id}`;
+            
+            // Usa o nome e preço específicos da bebida selecionada
+            addToCart(uniqueId, selectedDrink.name, selectedDrink.price);
+            
+            drinkModal.style.display = 'none';
+            selectedDrink = null;
+            currentItem = null;
+        });
+
+        // Adicionar item ao carrinho
+        function addToCart(id, name, price) {
+            const existingItem = cart.find(item => item.id === id);
+            
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({
+                    id,
+                    name,
+                    price,
+                    quantity: 1
+                });
+            }
+            
+            updateCart();
+            showCart();
+            saveCartToLocalStorage();
+        }
+
+        // Atualizar carrinho
+        function updateCart() {
+            cartItems.innerHTML = '';
+            let total = 0;
+            
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <div class="cart-item-info">
+                        <h4>${item.name}</h4>
+                        <p>R$ ${item.price.toFixed(2)}</p>
+                    </div>
+                    <div class="cart-item-quantity">
+                        <button class="decrease" data-id="${item.id}">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="increase" data-id="${item.id}">+</button>
+                    </div>
+                    <div class="cart-item-remove" data-id="${item.id}">
+                        <i class="fas fa-trash"></i>
+                    </div>
+                `;
+                
+                cartItems.appendChild(cartItem);
+            });
+            
+            cartTotal.textContent = `R$ ${total.toFixed(2)}`;
+            cartBadge.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+            pixAmount.textContent = `R$ ${(total * 0.95).toFixed(2)}`; // 5% de desconto no PIX
+            
+            // Atualizar opções de parcelamento
+            cardParcels.innerHTML = '';
+            for (let i = 1; i <= 12; i++) {
+                const parcelValue = total / i;
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `${i}x de R$ ${parcelValue.toFixed(2)} ${i > 1 ? 'sem juros' : ''}`;
+                cardParcels.appendChild(option);
+            }
+            
+            // Adicionar eventos para os novos botões
+            document.querySelectorAll('.decrease').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    decreaseQuantity(id);
+                });
+            });
+            
+            document.querySelectorAll('.increase').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    increaseQuantity(id);
+                });
+            });
+            
+            document.querySelectorAll('.cart-item-remove').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    removeFromCart(id);
+                });
+            });
+        }
+
+        // Aumentar quantidade
+        function increaseQuantity(id) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                item.quantity++;
+                updateCart();
+                saveCartToLocalStorage();
+            }
+        }
+
+        // Diminuir quantidade
+        function decreaseQuantity(id) {
+            const item = cart.find(item => item.id === id);
+            if (item && item.quantity > 1) {
+                item.quantity--;
+                updateCart();
+                saveCartToLocalStorage();
+            } else if (item && item.quantity === 1) {
+                removeFromCart(id);
+            }
+        }
+
+        // Remover item
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            updateCart();
+            saveCartToLocalStorage();
+            
+            if (cart.length === 0) {
+                hideCart();
+            }
+        }
+
+        // Mostrar carrinho
+        function showCart() {
+            cartContainer.style.display = 'block';
+        }
+
+        // Esconder carrinho
+        function hideCart() {
+            cartContainer.style.display = 'none';
+        }
+
+        // Carrinho flutuante
+        cartFloat.addEventListener('click', function() {
+            if (cart.length > 0) {
+                showCart();
+            } else {
+                alert('Seu carrinho está vazio!');
+            }
+        });
+
+        // Fechar carrinho
+        closeCart.addEventListener('click', hideCart);
+
+        // Finalizar compra
+        checkoutBtn.addEventListener('click', function() {
+            if (cart.length > 0) {
+                paymentModal.style.display = 'flex';
+            }
+        });
+
+        // Fechar modal
+        closeModal.addEventListener('click', function() {
+            paymentModal.style.display = 'none';
+        });
+
+        // Selecionar método de pagamento
+        document.querySelectorAll('.payment-method').forEach(method => {
+            method.addEventListener('click', function() {
+                document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('active'));
+                this.classList.add('active');
+                
+                document.querySelectorAll('.payment-details').forEach(detail => {
+                    detail.classList.remove('active');
+                });
+                
+                const methodType = this.getAttribute('data-method');
+                document.getElementById(`${methodType}Details`).classList.add('active');
+            });
+        });
+
+        // Confirmar PIX
+        confirmPix.addEventListener('click', function() {
+            alert('Pedido confirmado! Seu pedido está sendo preparado e chegará em breve.');
+            cart = [];
+            updateCart();
+            hideCart();
+            paymentModal.style.display = 'none';
+            saveCartToLocalStorage();
+        });
+
+        // Confirmar Cartão
+        confirmCredit.addEventListener('click', function() {
+            const cardNumber = document.getElementById('cardNumber').value;
+            const cardName = document.getElementById('cardName').value;
+            const cardExpiry = document.getElementById('cardExpiry').value;
+            const cardCvv = document.getElementById('cardCvv').value;
+            
+            if (!cardNumber || !cardName || !cardExpiry || !cardCvv) {
+                alert('Por favor, preencha todos os campos do cartão.');
+                return;
+            }
+            
+            alert('Pagamento aprovado! Seu pedido está sendo preparado e chegará em breve.');
+            cart = [];
+            updateCart();
+            hideCart();
+            paymentModal.style.display = 'none';
+            saveCartToLocalStorage();
+        });
+
+        // Fechar modal ao clicar fora
+        window.addEventListener('click', function(event) {
+            if (event.target === paymentModal) {
+                paymentModal.style.display = 'none';
+            }
+            if (event.target === drinkModal) {
+                drinkModal.style.display = 'none';
+                selectedDrink = null;
+                currentItem = null;
+            }
+        });
+
+        // Salvar carrinho no localStorage
+        function saveCartToLocalStorage() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+    </script>
+</body>
+</html>
