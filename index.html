@@ -1614,83 +1614,46 @@ const ShoppingCart = (() => {
     };
 
     const confirmAddress = () => {
-        const street = document.getElementById('addressStreet').value;
-        const number = document.getElementById('addressNumber').value;
-        const neighborhood = document.getElementById('addressNeighborhood').value;
-        const complement = document.getElementById('addressComplement').value;
-        const reference = document.getElementById('addressReference').value;
+    const street = document.getElementById('addressStreet').value;
+    const number = document.getElementById('addressNumber').value;
+    const neighborhood = document.getElementById('addressNeighborhood').value;
+    const complement = document.getElementById('addressComplement').value;
+    const reference = document.getElementById('addressReference').value;
 
-        if (!street || !number || !neighborhood) {
-            alert('Por favor, preencha pelo menos endereço, número e bairro');
-            return;
-        }
+    if (!street || !number || !neighborhood) {
+        alert('Por favor, preencha pelo menos endereço, número e bairro');
+        return;
+    }
 
-        currentAddress = {
-            street,
-            number,
-            neighborhood,
-            complement,
-            reference
-        };
-
-        // Agora adiciona o item ao carrinho
-        addToCart(currentItem.id, currentItem.name, currentItem.price);
-        hideAddressModal();
+    currentAddress = {
+        street,
+        number,
+        neighborhood,
+        complement,
+        reference
     };
 
-    const addToCart = (id, name, price) => {
-        // Lógica para adicionar item ao carrinho
-        const existingItem = cart.find(item => item.id === id);
-        
-        if (existingItem) {
-            existingItem.quantity += 1;
-        } else {
-            cart.push({
-                id,
-                name,
-                price,
-                quantity: 1,
-                address: currentAddress // Adiciona o endereço ao item
-            });
-        }
-        
-        updateCartUI();
+    // Redireciona para o checkout correspondente
+    redirectToCheckout(currentItem.id);
+    hideAddressModal();
+};
+
+const redirectToCheckout = (itemId) => {
+    const checkoutUrls = {
+        '1': 'https://app.pushinpay.com.br/service/pay/9F67C082-6D59-4F40-8630-574657EC28C0', // Combo na Brasa
+        '2': 'https://app.pushinpay.com.br/service/pay/9f67c138-d5a2-4603-b673-8e905d0f1b30', // Combo Selvagem
+        '3': 'https://app.pushinpay.com.br/service/pay/9f67c1c5-4cf7-4f66-90ce-45edae1995b0' // Combo Brasa Supremo
     };
 
-    const updateCartUI = () => {
-        // Atualiza a UI do carrinho
-        const cartItemsElement = document.querySelector('.cart-items');
-        const cartTotalElement = document.querySelector('.cart-total');
-        const cartBadgeElement = document.querySelector('.cart-badge');
-        
-        if (cartItemsElement && cartTotalElement && cartBadgeElement) {
-            cartItemsElement.innerHTML = '';
-            
-            let total = 0;
-            
-            cart.forEach(item => {
-                total += item.price * item.quantity;
-                
-                const itemElement = document.createElement('div');
-                itemElement.className = 'cart-item';
-                itemElement.innerHTML = `
-                    <div class="cart-item-info">${item.name}</div>
-                    <div class="cart-item-quantity">
-                        <button class="decrease-quantity" data-id="${item.id}">-</button>
-                        <span>${item.quantity}</span>
-                        <button class="increase-quantity" data-id="${item.id}">+</button>
-                    </div>
-                    <div class="cart-item-price">R$ ${(item.price * item.quantity).toFixed(2)}</div>
-                    <div class="cart-item-remove" data-id="${item.id}">&times;</div>
-                `;
-                
-                cartItemsElement.appendChild(itemElement);
-            });
-            
-            cartTotalElement.textContent = `Total: R$ ${total.toFixed(2)}`;
-            cartBadgeElement.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
-        }
-    };
+    // Para combos com bebidas, removemos a parte após o hífen (id da bebida)
+    const baseItemId = itemId.split('-')[0];
+    
+    if (checkoutUrls[baseItemId]) {
+        window.location.href = checkoutUrls[baseItemId];
+    } else {
+        alert('Checkout não disponível para este item');
+    }
+};
 
     return {
         init,
@@ -1969,7 +1932,7 @@ const DrinkSelection = (() => {
     
     // Define o item atual antes de mostrar o modal de endereço
     ShoppingCart.currentItem = {
-        id: `${currentItem.id}-${selectedDrink.id}`,
+        id: `${currentItem.id}-${selectedDrink.id}`, // Inclui o ID da bebida
         name: itemName,
         price: totalPrice,
         hasDrink: false // Marcamos como false pois já incluímos a bebida no nome e preço
