@@ -18,6 +18,68 @@
     
     <!-- CSS -->
     <style>
+
+        /* Estilo adicional para o modal de bebidas */
+        .drink-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .drink-content {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .drink-options {
+            margin: 15px 0;
+        }
+
+        .drink-option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .drink-option:hover {
+            border-color: #ba172a;
+            background-color: #f9f9f9;
+        }
+
+        .drink-option.active {
+            border-color: #ba172a;
+            background-color: #fff5f5;
+        }
+
+        .close-drink-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #333;
+            background: none;
+            border: none;
+}
+
         /* Reset e Estilos Globais */
         * {
             margin: 0;
@@ -1401,6 +1463,103 @@
 
     <!-- JavaScript -->
     <script>
+
+// =============================================
+// MÓDULO DO CARRINHO DE COMPRAS
+// =============================================
+const ShoppingCart = (() => {
+    let cart = [];
+    let currentItem = null;
+    let selectedDrink = null;
+
+    const init = () => {
+        updateCartUI();
+        
+        // Adiciona evento de clique para os botões "Adicionar ao Carrinho"
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const item = {
+                    id: button.dataset.id,
+                    name: button.dataset.name,
+                    price: parseFloat(button.dataset.price),
+                    hasDrink: button.dataset.hasDrink === 'true',
+                    drinkType: button.dataset.drinkType
+                };
+                
+                currentItem = item;
+                
+                if (item.hasDrink) {
+                    // Mostra o modal de seleção de bebidas
+                    DrinkSelection.showModal(item, item.drinkType);
+                } else {
+                    // Adiciona diretamente ao carrinho se não tiver bebida
+                    addToCart(item.id, item.name, item.price);
+                }
+            });
+        });
+    };
+
+    const addToCart = (id, name, price) => {
+        // Lógica para adicionar item ao carrinho
+        const existingItem = cart.find(item => item.id === id);
+        
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            cart.push({
+                id,
+                name,
+                price,
+                quantity: 1
+            });
+        }
+        
+        updateCartUI();
+    };
+
+    const updateCartUI = () => {
+        // Atualiza a UI do carrinho
+        const cartItemsElement = document.querySelector('.cart-items');
+        const cartTotalElement = document.querySelector('.cart-total');
+        const cartBadgeElement = document.querySelector('.cart-badge');
+        
+        if (cartItemsElement && cartTotalElement && cartBadgeElement) {
+            cartItemsElement.innerHTML = '';
+            
+            let total = 0;
+            
+            cart.forEach(item => {
+                total += item.price * item.quantity;
+                
+                const itemElement = document.createElement('div');
+                itemElement.className = 'cart-item';
+                itemElement.innerHTML = `
+                    <div class="cart-item-info">${item.name}</div>
+                    <div class="cart-item-quantity">
+                        <button class="decrease-quantity" data-id="${item.id}">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="increase-quantity" data-id="${item.id}">+</button>
+                    </div>
+                    <div class="cart-item-price">R$ ${(item.price * item.quantity).toFixed(2)}</div>
+                    <div class="cart-item-remove" data-id="${item.id}">&times;</div>
+                `;
+                
+                cartItemsElement.appendChild(itemElement);
+            });
+            
+            cartTotalElement.textContent = `Total: R$ ${total.toFixed(2)}`;
+            cartBadgeElement.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+        }
+    };
+
+    return {
+        init,
+        addToCart,
+        currentItem,
+        selectedDrink
+    };
+})();
+
         // =============================================
         // MÓDULO PRINCIPAL - APP BRASA BURGUER
         // =============================================
@@ -1576,111 +1735,106 @@
         })();
         
         // =============================================
-        // MÓDULO DE SELEÇÃO DE BEBIDAS
-        // =============================================
-        const DrinkSelection = (() => {
-            const drinkTypes = {
-                refri: [
-                    { id: 'coca', name: 'Coca-Cola Lata', price: 6.00, icon: '<i class="fas fa-wine-bottle" style="color: #ba172a;"></i>' },
-                    { id: 'guarana', name: 'Guaraná Lata', price: 6.00, icon: '<i class="fas fa-wine-bottle" style="color: #4CAF50;"></i>' },
-                    { id: 'fanta', name: 'Fanta Lata', price: 6.00, icon: '<i class="fas fa-wine-bottle" style="color: #FF9800;"></i>' },
-                    { id: 'sprite', name: 'Sprite Lata', price: 6.00, icon: '<i class="fas fa-wine-bottle" style="color: #00BCD4;"></i>' }
-                ],
-                suco: [
-                    { id: 'laranja', name: 'Suco de Laranja', price: 6.00, icon: '<i class="fas fa-glass-whiskey" style="color: #FF9800;"></i>' },
-                    { id: 'maracuja', name: 'Suco de Maracujá', price: 6.00, icon: '<i class="fas fa-glass-whiskey" style="color: #FFEB3B;"></i>' },
-                    { id: 'limao', name: 'Suco de Limão', price: 6.00, icon: '<i class="fas fa-glass-whiskey" style="color: #CDDC39;"></i>' },
-                    { id: 'abacaxi', name: 'Suco de Abacaxi', price: 6.00, icon: '<i class="fas fa-glass-whiskey" style="color: #FFC107;"></i>' }
-                ],
-                energetico: [
-                    { id: 'redbull', name: 'Red Bull 250ml', price: 8.00, icon: '<i class="fas fa-bolt" style="color: #0055A4;"></i>' },
-                    { id: 'monster', name: 'Monster Energy 250ml', price: 8.00, icon: '<i class="fas fa-bolt" style="color: #4CAF50;"></i>' },
-                    { id: 'agua', name: 'Água Mineral 500ml', price: 5.00, icon: '<i class="fas fa-tint" style="color: #2196F3;"></i>' }
-                ]
-            };
+// MÓDULO DE SELEÇÃO DE BEBIDAS
+// =============================================
+const DrinkSelection = (() => {
+    const drinkTypes = {
+        refri: [
+            { id: 'coca', name: 'Coca-Cola Lata', price: 6.90, icon: '<i class="fas fa-wine-bottle" style="color: #ba172a;"></i>' },
+            { id: 'guarana', name: 'Guaraná Lata', price: 6.90, icon: '<i class="fas fa-wine-bottle" style="color: #4CAF50;"></i>' },
+            { id: 'fanta', name: 'Fanta Lata', price: 6.90, icon: '<i class="fas fa-wine-bottle" style="color: #FF9800;"></i>' },
+            { id: 'sprite', name: 'Sprite Lata', price: 6.90, icon: '<i class="fas fa-wine-bottle" style="color: #00BCD4;"></i>' }
+        ],
+        suco: [
+            { id: 'laranja', name: 'Suco de Laranja', price: 6.90, icon: '<i class="fas fa-glass-whiskey" style="color: #FF9800;"></i>' },
+            { id: 'maracuja', name: 'Suco de Maracujá', price: 6.90, icon: '<i class="fas fa-glass-whiskey" style="color: #FFEB3B;"></i>' },
+            { id: 'limao', name: 'Suco de Limão', price: 6.90, icon: '<i class="fas fa-glass-whiskey" style="color: #CDDC39;"></i>' },
+            { id: 'abacaxi', name: 'Suco de Abacaxi', price: 6.90, icon: '<i class="fas fa-glass-whiskey" style="color: #FFC107;"></i>' }
+        ],
+        energetico: [
+            { id: 'redbull', name: 'Red Bull 250ml', price: 8.90, icon: '<i class="fas fa-bolt" style="color: #0055A4;"></i>' },
+            { id: 'monster', name: 'Monster Energy 250ml', price: 8.90, icon: '<i class="fas fa-bolt" style="color: #4CAF50;"></i>' },
+            { id: 'agua', name: 'Água Mineral 500ml', price: 5.90, icon: '<i class="fas fa-tint" style="color: #2196F3;"></i>' }
+        ]
+    };
 
-            const init = () => {
-                document.getElementById('closeDrinkModal').addEventListener('click', hideModal);
-                document.getElementById('cancelDrink').addEventListener('click', hideModal);
-                document.getElementById('confirmDrink').addEventListener('click', confirmSelection);
-            };
+    const init = () => {
+        document.getElementById('closeDrinkModal').addEventListener('click', hideModal);
+        document.getElementById('cancelDrink').addEventListener('click', hideModal);
+        document.getElementById('confirmDrink').addEventListener('click', confirmSelection);
+    };
 
-            const showModal = (item, drinkType) => {
-                document.getElementById('drinkModalTitle').textContent = getTitleForDrinkType(drinkType);
-                renderDrinkOptions(drinkType);
-                document.getElementById('drinkModal').style.display = 'flex';
-                ShoppingCart.currentItem = item;
-            };
+    const showModal = (item, drinkType) => {
+        document.getElementById('drinkModalTitle').textContent = getTitleForDrinkType(drinkType);
+        renderDrinkOptions(drinkType);
+        document.getElementById('drinkModal').style.display = 'flex';
+        document.body.classList.add('no-scroll');
+        ShoppingCart.currentItem = item;
+    };
 
-            const hideModal = () => {
-                document.getElementById('drinkModal').style.display = 'none';
-                ShoppingCart.currentItem = null;
-                ShoppingCart.selectedDrink = null;
-            };
+    const hideModal = () => {
+        document.getElementById('drinkModal').style.display = 'none';
+        document.body.classList.remove('no-scroll');
+        ShoppingCart.currentItem = null;
+        ShoppingCart.selectedDrink = null;
+    };
 
-            const getTitleForDrinkType = (drinkType) => {
-                switch(drinkType) {
-                    case 'refri': return 'Selecione seu refrigerante';
-                    case 'suco': return 'Selecione seu suco';
-                    default: return 'Selecione sua bebida';
-                }
-            };
+    const getTitleForDrinkType = (drinkType) => {
+        return 'Selecione sua bebida';
+    };
 
-            const renderDrinkOptions = (drinkType) => {
-                const drinkOptions = document.getElementById('drinkOptions');
-                drinkOptions.innerHTML = '';
+    const renderDrinkOptions = (drinkType) => {
+        const drinkOptions = document.getElementById('drinkOptions');
+        drinkOptions.innerHTML = '';
 
-                drinkTypes[drinkType].forEach(drink => {
-                    const option = document.createElement('div');
-                    option.className = 'drink-option';
-                    option.dataset.id = drink.id;
-                    option.innerHTML = `
-                        <div style="width: 30px; text-align: center; margin-right: 10px;">
-                            ${drink.icon}
-                        </div>
-                        <div>
-                            <div>${drink.name}</div>
-                            <div style="font-size: 0.9rem; color: #ba172a;">R$ ${drink.price.toFixed(2)}</div>
-                        </div>
-                    `;
-                    
-                    option.addEventListener('click', () => selectDrink(option, drink));
-                    drinkOptions.appendChild(option);
-                });
-            };
+        drinkTypes[drinkType].forEach(drink => {
+            const option = document.createElement('div');
+            option.className = 'drink-option';
+            option.dataset.id = drink.id;
+            option.innerHTML = `
+                <div style="width: 30px; text-align: center; margin-right: 10px;">
+                    ${drink.icon}
+                </div>
+                <div>
+                    <div>${drink.name}</div>
+                    <div style="font-size: 0.9rem; color: #ba172a;">R$ ${drink.price.toFixed(2)}</div>
+                </div>
+            `;
+            
+            option.addEventListener('click', () => selectDrink(option, drink));
+            drinkOptions.appendChild(option);
+        });
+    };
 
-            const selectDrink = (optionElement, drink) => {
-                document.querySelectorAll('.drink-option').forEach(opt => {
-                    opt.classList.remove('active');
-                });
-                optionElement.classList.add('active');
-                ShoppingCart.selectedDrink = drink;
-            };
+    const selectDrink = (optionElement, drink) => {
+        document.querySelectorAll('.drink-option').forEach(opt => {
+            opt.classList.remove('active');
+        });
+        optionElement.classList.add('active');
+        ShoppingCart.selectedDrink = drink;
+    };
 
-            const confirmSelection = () => {
-                if (!ShoppingCart.selectedDrink) {
-                    alert('Por favor, selecione uma bebida');
-                    return;
-                }
+    const confirmSelection = () => {
+        if (!ShoppingCart.selectedDrink) {
+            alert('Por favor, selecione uma bebida');
+            return;
+        }
 
-                const { currentItem, selectedDrink } = ShoppingCart;
-                
-                if (currentItem.hasDrink) {
-                    const itemName = `${currentItem.name} (${selectedDrink.name})`;
-                    ShoppingCart.addToCart(currentItem.id, itemName, currentItem.price);
-                } else {
-                    const uniqueId = `${currentItem.id}-${selectedDrink.id}`;
-                    ShoppingCart.addToCart(uniqueId, selectedDrink.name, selectedDrink.price);
-                }
+        const { currentItem, selectedDrink } = ShoppingCart;
+        
+        // Adiciona o combo com a bebida selecionada
+        const itemName = `${currentItem.name} (${selectedDrink.name})`;
+        const totalPrice = currentItem.price + selectedDrink.price;
+        
+        ShoppingCart.addToCart(`${currentItem.id}-${selectedDrink.id}`, itemName, totalPrice);
+        hideModal();
+    };
 
-                hideModal();
-            };
-
-            return { 
-                init,
-                showModal
-            };
-        })();
+    return { 
+        init,
+        showModal
+    };
+})();
     </script>
 </body>
 </html>
