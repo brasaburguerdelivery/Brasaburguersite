@@ -1442,35 +1442,76 @@
         </div>
     </footer>
 
-    <!-- Modal de Seleção de Bebidas -->
-    <div class="drink-modal" id="drinkModal">
-        <div class="drink-content">
-            <span class="close-drink-modal" id="closeDrinkModal">&times;</span>
-            <h3 id="drinkModalTitle">Selecione sua bebida</h3>
-            
-            <div class="drink-options" id="drinkOptions">
-                <!-- Opções serão preenchidas dinamicamente -->
-            </div>
-            
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button class="btn" id="confirmDrink">Confirmar</button>
-                <button class="btn cancel-drink-btn" id="cancelDrink">Cancelar</button>
-            </div>
-        </div>
-    </div>
 
     <!-- JavaScript -->
     <script>
         // =============================================
-        // MÓDULO PRINCIPAL - APP BRASA BURGUER
-        // =============================================
-        document.addEventListener('DOMContentLoaded', () => {
-            // Inicializa todos os módulos
-            MobileMenu.init();
-            SmoothScroll.init();
-            HeaderEffects.init();
-            LocationService.init();
-        });
+    // MÓDULO PRINCIPAL - APP BRASA BURGUER
+    // =============================================
+    document.addEventListener('DOMContentLoaded', () => {
+        // Inicializa todos os módulos
+        MobileMenu.init();
+        SmoothScroll.init();
+        HeaderEffects.init();
+        LocationService.init();
+        OrderModule.init();
+    });
+
+    // =============================================
+    // MÓDULO DE PEDIDOS
+    // =============================================
+    const OrderModule = (() => {
+        const init = () => {
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productId = this.getAttribute('data-id');
+                    
+                    // Combos que precisam selecionar bebida
+                    if (productId === '1' || productId === '2') {
+                        selectDrink(productId);
+                    } 
+                    // Combo que vai direto para o checkout
+                    else if (productId === '3') {
+                        window.location.href = 'https://app.pushinpay.com.br/service/pay/9f67c1c5-4cf7-4f66-90ce-45edae1995b0';
+                    }
+                });
+            });
+        };
+
+        const selectDrink = (productId) => {
+            const drinkOptions = [
+                { name: "Coca-Cola Lata", price: 6.90 },
+                { name: "Guaraná Lata", price: 6.90 },
+                { name: "Fanta Lata", price: 6.90 },
+                { name: "Sprite Lata", price: 6.90 }
+            ];
+
+            let drinkList = "Selecione sua bebida:\n\n";
+            drinkOptions.forEach((drink, index) => {
+                drinkList += `${index + 1}. ${drink.name} - R$ ${drink.price.toFixed(2)}\n`;
+            });
+
+            const choice = prompt(drinkList + "\nDigite o número da bebida desejada:");
+            const selectedIndex = parseInt(choice) - 1;
+
+            if (selectedIndex >= 0 && selectedIndex < drinkOptions.length) {
+                const selectedDrink = drinkOptions[selectedIndex];
+                alert(`Você selecionou: ${selectedDrink.name}\nRedirecionando para o checkout...`);
+                
+                // Redireciona para o checkout correspondente ao produto
+                if (productId === '1') {
+                    window.location.href = 'https://app.pushinpay.com.br/service/pay/9F67C082-6D59-4F40-8630-574657EC28C0';
+                } else if (productId === '2') {
+                    window.location.href = 'https://app.pushinpay.com.br/service/pay/9f67c138-d5a2-4603-b673-8e905d0f1b30';
+                }
+            } else {
+                alert("Opção inválida. Por favor, tente novamente.");
+            }
+        };
+
+        return { init };
+    })();
 
         // =============================================
         // MÓDULO DE MENU MOBILE
