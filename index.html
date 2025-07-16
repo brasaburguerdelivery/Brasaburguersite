@@ -1113,7 +1113,8 @@
 
     <!-- Hero Section -->
     <section class="hero" id="home">
-        <div class="container">            
+        <div class="container">
+            <h1>Os melhores lanches com delivery rápido</h1>
             <p>Peça online e receba em minutos. Delivery rápido e sabor garantido!</p>
             <a href="cardapio.html" class="btn">Ver Cardápio</a>
         </div>
@@ -1144,7 +1145,7 @@
             <div class="online-status">
                 <span class="online-dot"></span>
                 <span class="online-text">Online</span>
-                <span class="status-text">- Aberto agora</span>
+                <span class="status-text">Aberto agora</span>
             </div>
             
             <h2 class="section-title">Destaques do Cardápio</h2>
@@ -1442,76 +1443,38 @@
         </div>
     </footer>
 
+    <!-- Modal de Seleção de Bebidas -->
+    <div class="drink-modal" id="drinkModal">
+        <div class="drink-content">
+            <span class="close-drink-modal" id="closeDrinkModal">&times;</span>
+            <h3 id="drinkModalTitle">Selecione sua bebida</h3>
+            
+            <div class="drink-options" id="drinkOptions">
+                <!-- Opções serão preenchidas dinamicamente -->
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn" id="confirmDrink">Confirmar</button>
+                <button class="btn cancel-drink-btn" id="cancelDrink">Cancelar</button>
+            </div>
+        </div>
+    </div>
 
     <!-- JavaScript -->
     <script>
         // =============================================
-    // MÓDULO PRINCIPAL - APP BRASA BURGUER
-    // =============================================
-    document.addEventListener('DOMContentLoaded', () => {
-        // Inicializa todos os módulos
-        MobileMenu.init();
-        SmoothScroll.init();
-        HeaderEffects.init();
-        LocationService.init();
-        OrderModule.init();
-    });
-
-    // =============================================
-    // MÓDULO DE PEDIDOS
-    // =============================================
-    const OrderModule = (() => {
-        const init = () => {
-            document.querySelectorAll('.add-to-cart').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const productId = this.getAttribute('data-id');
-                    
-                    // Combos que precisam selecionar bebida
-                    if (productId === '1' || productId === '2') {
-                        selectDrink(productId);
-                    } 
-                    // Combo que vai direto para o checkout
-                    else if (productId === '3') {
-                        window.location.href = 'https://app.pushinpay.com.br/service/pay/9f67c1c5-4cf7-4f66-90ce-45edae1995b0';
-                    }
-                });
-            });
-        };
-
-        const selectDrink = (productId) => {
-            const drinkOptions = [
-                { name: "Coca-Cola Lata", price: 6.90 },
-                { name: "Guaraná Lata", price: 6.90 },
-                { name: "Fanta Lata", price: 6.90 },
-                { name: "Sprite Lata", price: 6.90 }
-            ];
-
-            let drinkList = "Selecione sua bebida:\n\n";
-            drinkOptions.forEach((drink, index) => {
-                drinkList += `${index + 1}. ${drink.name} - R$ ${drink.price.toFixed(2)}\n`;
-            });
-
-            const choice = prompt(drinkList + "\nDigite o número da bebida desejada:");
-            const selectedIndex = parseInt(choice) - 1;
-
-            if (selectedIndex >= 0 && selectedIndex < drinkOptions.length) {
-                const selectedDrink = drinkOptions[selectedIndex];
-                alert(`Você selecionou: ${selectedDrink.name}\nRedirecionando para o checkout...`);
-                
-                // Redireciona para o checkout correspondente ao produto
-                if (productId === '1') {
-                    window.location.href = 'https://app.pushinpay.com.br/service/pay/9F67C082-6D59-4F40-8630-574657EC28C0';
-                } else if (productId === '2') {
-                    window.location.href = 'https://app.pushinpay.com.br/service/pay/9f67c138-d5a2-4603-b673-8e905d0f1b30';
-                }
-            } else {
-                alert("Opção inválida. Por favor, tente novamente.");
-            }
-        };
-
-        return { init };
-    })();
+        // MÓDULO PRINCIPAL - APP BRASA BURGUER
+        // =============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializa todos os módulos
+            MobileMenu.init();
+            SmoothScroll.init();
+            HeaderEffects.init();
+            LocationService.init();
+            ShoppingCart.init();
+            DrinkSelection.init();
+            PaymentSystem.init();
+        });
 
         // =============================================
         // MÓDULO DE MENU MOBILE
@@ -1674,34 +1637,451 @@
         })();
 
         // =============================================
-        // MÓDULO DE PEDIDOS
+        // MÓDULO DO CARRINHO DE COMPRAS
         // =============================================
-        document.addEventListener('DOMContentLoaded', () => {
-            // Configura os eventos para os botões de pedido
-            document.querySelectorAll('.add-to-cart').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
+        const ShoppingCart = (() => {
+            let cart = [];
+            let currentItem = null;
+            let selectedDrink = null;
+
+            const init = () => {
+                loadCart();
+                setupEventListeners();
+                setupCartTooltip();
+            };
+
+            const loadCart = () => {
+                const savedCart = localStorage.getItem('cart');
+                if (savedCart) {
+                    cart = JSON.parse(savedCart);
+                    updateCartUI();
+                }
+            };
+
+            const setupEventListeners = () => {
+                // Carrinho flutuante
+                document.getElementById('cartFloat').addEventListener('click', toggleCart);
+                
+                // Fechar carrinho
+                document.getElementById('closeCart').addEventListener('click', () => {
+                    document.getElementById('cartContainer').style.display = 'none';
+                });
+                
+                // Continuar comprando
+                document.querySelector('.cart-actions .btn:last-child').addEventListener('click', () => {
+                    document.getElementById('cartContainer').style.display = 'none';
+                });
+                
+                // Delegar eventos para os botões "Adicionar ao Carrinho"
+                document.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('add-to-cart')) {
+                        handleAddToCartClick(e.target);
+                    }
                     
-                    // Obtém o ID do produto
-                    const productId = this.getAttribute('data-id');
-                    
-                    // Redireciona para o checkout correspondente
-                    switch(productId) {
-                        case '1':
-                            window.location.href = 'https://app.pushinpay.com.br/service/pay/9F67C082-6D59-4F40-8630-574657EC28C0';
-                            break;
-                        case '2':
-                            window.location.href = 'https://app.pushinpay.com.br/service/pay/9f67c138-d5a2-4603-b673-8e905d0f1b30';
-                            break;
-                        case '3':
-                            window.location.href = 'https://app.pushinpay.com.br/service/pay/9f67c1c5-4cf7-4f66-90ce-45edae1995b0';
-                            break;
-                        default:
-                            window.location.href = 'https://app.pushinpay.com.br/service/pay/9F67C082-6D59-4F40-8630-574657EC28C0';
+                    // Para botões dentro do elemento .add-to-cart (como ícones)
+                    if (e.target.closest('.add-to-cart')) {
+                        handleAddToCartClick(e.target.closest('.add-to-cart'));
                     }
                 });
-            });
-        });
+            };
+
+            const handleAddToCartClick = function(btn) {
+                const id = btn.getAttribute('data-id');
+                const name = btn.getAttribute('data-name');
+                const price = parseFloat(btn.getAttribute('data-price'));
+                const hasDrink = btn.getAttribute('data-has-drink') === 'true';
+                const drinkType = btn.getAttribute('data-drink-type') || btn.getAttribute('data-type');
+
+                if (hasDrink && drinkType) {
+                    currentItem = { id, name, price, hasDrink: true, drinkType };
+                    DrinkSelection.showModal(currentItem, drinkType);
+                } else if (drinkType) {
+                    currentItem = { id, baseName: name, basePrice: price, type: drinkType };
+                    DrinkSelection.showModal(currentItem, drinkType);
+                } else {
+                    addToCart(id, name, price);
+                }
+            };
+
+            const addToCart = (id, name, price) => {
+                const existingItem = cart.find(item => item.id === id);
+
+                if (existingItem) {
+                    existingItem.quantity++;
+                } else {
+                    cart.push({ id, name, price, quantity: 1 });
+                }
+
+                updateCartUI();
+                saveCart();
+                showCart();
+            };
+
+            const updateCartUI = () => {
+                const cartItems = document.getElementById('cartItems');
+                const cartTotal = document.getElementById('cartTotal');
+                const cartBadge = document.getElementById('cartBadge');
+                
+                cartItems.innerHTML = '';
+                let total = 0;
+
+                cart.forEach(item => {
+                    total += item.price * item.quantity;
+                    
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'cart-item';
+                    cartItem.innerHTML = `
+                        <div class="cart-item-info">
+                            <h4>${item.name}</h4>
+                            <p>R$ ${item.price.toFixed(2)}</p>
+                        </div>
+                        <div class="cart-item-quantity">
+                            <button class="decrease" data-id="${item.id}">-</button>
+                            <span>${item.quantity}</span>
+                            <button class="increase" data-id="${item.id}">+</button>
+                        </div>
+                        <div class="cart-item-remove" data-id="${item.id}">
+                            <i class="fas fa-trash"></i>
+                        </div>
+                    `;
+                    
+                    cartItems.appendChild(cartItem);
+                });
+
+                // Atualiza totais e badge
+                cartTotal.textContent = `R$ ${total.toFixed(2)}`;
+                cartBadge.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+                // Adiciona eventos aos novos botões
+                setupCartItemEvents();
+            };
+
+            const setupCartItemEvents = () => {
+                document.querySelectorAll('.decrease').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        decreaseQuantity(id);
+                    });
+                });
+
+                document.querySelectorAll('.increase').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        increaseQuantity(id);
+                    });
+                });
+
+                document.querySelectorAll('.cart-item-remove').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        removeFromCart(id);
+                    });
+                });
+            };
+
+            const increaseQuantity = (id) => {
+                const item = cart.find(item => item.id === id);
+                if (item) {
+                    item.quantity++;
+                    updateCartUI();
+                    saveCart();
+                }
+            };
+
+            const decreaseQuantity = (id) => {
+                const item = cart.find(item => item.id === id);
+                if (!item) return;
+
+                if (item.quantity > 1) {
+                    item.quantity--;
+                    updateCartUI();
+                    saveCart();
+                } else {
+                    removeFromCart(id);
+                }
+            };
+
+            const removeFromCart = (id) => {
+                cart = cart.filter(item => item.id !== id);
+                updateCartUI();
+                saveCart();
+                
+                if (cart.length === 0) {
+                    hideCart();
+                }
+            };
+
+            const saveCart = () => {
+                localStorage.setItem('cart', JSON.stringify(cart));
+            };
+
+            const showCart = () => {
+                document.getElementById('cartContainer').style.display = 'block';
+            };
+
+            const hideCart = () => {
+                document.getElementById('cartContainer').style.display = 'none';
+            };
+
+            const toggleCart = () => {
+                if (cart.length > 0) {
+                    showCart();
+                } else {
+                    alert('Seu carrinho está vazio!');
+                }
+            };
+
+            const setupCartTooltip = () => {
+                const cartFloat = document.getElementById('cartFloat');
+                const tooltip = cartFloat.querySelector('.cart-float-tooltip');
+
+                // Mostra tooltip após 2 segundos na primeira vez
+                setTimeout(() => {
+                    tooltip.style.opacity = '1';
+                    setTimeout(() => tooltip.style.opacity = '0', 3000);
+                }, 2000);
+
+                // Mostra tooltip ao passar o mouse
+                cartFloat.addEventListener('mouseenter', () => {
+                    tooltip.style.opacity = '1';
+                });
+
+                cartFloat.addEventListener('mouseleave', () => {
+                    tooltip.style.opacity = '0';
+                });
+            };
+
+            const getCartTotal = () => {
+                return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            };
+
+            const clearCart = () => {
+                cart = [];
+                updateCartUI();
+                saveCart();
+                hideCart();
+            };
+
+            return { 
+                init,
+                getCartTotal,
+                clearCart,
+                currentItem,
+                selectedDrink,
+                addToCart
+            };
+        })();
+
+        // =============================================
+        // MÓDULO DE SELEÇÃO DE BEBIDAS
+        // =============================================
+        const DrinkSelection = (() => {
+            const drinkTypes = {
+                refri: [
+                    { id: 'coca', name: 'Coca-Cola Lata', price: 6.00, icon: '<i class="fas fa-wine-bottle" style="color: #ba172a;"></i>' },
+                    { id: 'guarana', name: 'Guaraná Lata', price: 6.00, icon: '<i class="fas fa-wine-bottle" style="color: #4CAF50;"></i>' },
+                    { id: 'fanta', name: 'Fanta Lata', price: 6.00, icon: '<i class="fas fa-wine-bottle" style="color: #FF9800;"></i>' },
+                    { id: 'sprite', name: 'Sprite Lata', price: 6.00, icon: '<i class="fas fa-wine-bottle" style="color: #00BCD4;"></i>' }
+                ],
+                suco: [
+                    { id: 'laranja', name: 'Suco de Laranja', price: 6.00, icon: '<i class="fas fa-glass-whiskey" style="color: #FF9800;"></i>' },
+                    { id: 'maracuja', name: 'Suco de Maracujá', price: 6.00, icon: '<i class="fas fa-glass-whiskey" style="color: #FFEB3B;"></i>' },
+                    { id: 'limao', name: 'Suco de Limão', price: 6.00, icon: '<i class="fas fa-glass-whiskey" style="color: #CDDC39;"></i>' },
+                    { id: 'abacaxi', name: 'Suco de Abacaxi', price: 6.00, icon: '<i class="fas fa-glass-whiskey" style="color: #FFC107;"></i>' }
+                ],
+                energetico: [
+                    { id: 'redbull', name: 'Red Bull 250ml', price: 8.00, icon: '<i class="fas fa-bolt" style="color: #0055A4;"></i>' },
+                    { id: 'monster', name: 'Monster Energy 250ml', price: 8.00, icon: '<i class="fas fa-bolt" style="color: #4CAF50;"></i>' },
+                    { id: 'agua', name: 'Água Mineral 500ml', price: 5.00, icon: '<i class="fas fa-tint" style="color: #2196F3;"></i>' }
+                ]
+            };
+
+            const init = () => {
+                document.getElementById('closeDrinkModal').addEventListener('click', hideModal);
+                document.getElementById('cancelDrink').addEventListener('click', hideModal);
+                document.getElementById('confirmDrink').addEventListener('click', confirmSelection);
+            };
+
+            const showModal = (item, drinkType) => {
+                document.getElementById('drinkModalTitle').textContent = getTitleForDrinkType(drinkType);
+                renderDrinkOptions(drinkType);
+                document.getElementById('drinkModal').style.display = 'flex';
+                ShoppingCart.currentItem = item;
+            };
+
+            const hideModal = () => {
+                document.getElementById('drinkModal').style.display = 'none';
+                ShoppingCart.currentItem = null;
+                ShoppingCart.selectedDrink = null;
+            };
+
+            const getTitleForDrinkType = (drinkType) => {
+                switch(drinkType) {
+                    case 'refri': return 'Selecione seu refrigerante';
+                    case 'suco': return 'Selecione seu suco';
+                    default: return 'Selecione sua bebida';
+                }
+            };
+
+            const renderDrinkOptions = (drinkType) => {
+                const drinkOptions = document.getElementById('drinkOptions');
+                drinkOptions.innerHTML = '';
+
+                drinkTypes[drinkType].forEach(drink => {
+                    const option = document.createElement('div');
+                    option.className = 'drink-option';
+                    option.dataset.id = drink.id;
+                    option.innerHTML = `
+                        <div style="width: 30px; text-align: center; margin-right: 10px;">
+                            ${drink.icon}
+                        </div>
+                        <div>
+                            <div>${drink.name}</div>
+                            <div style="font-size: 0.9rem; color: #ba172a;">R$ ${drink.price.toFixed(2)}</div>
+                        </div>
+                    `;
+                    
+                    option.addEventListener('click', () => selectDrink(option, drink));
+                    drinkOptions.appendChild(option);
+                });
+            };
+
+            const selectDrink = (optionElement, drink) => {
+                document.querySelectorAll('.drink-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                optionElement.classList.add('active');
+                ShoppingCart.selectedDrink = drink;
+            };
+
+            const confirmSelection = () => {
+                if (!ShoppingCart.selectedDrink) {
+                    alert('Por favor, selecione uma bebida');
+                    return;
+                }
+
+                const { currentItem, selectedDrink } = ShoppingCart;
+                
+                if (currentItem.hasDrink) {
+                    const itemName = `${currentItem.name} (${selectedDrink.name})`;
+                    ShoppingCart.addToCart(currentItem.id, itemName, currentItem.price);
+                } else {
+                    const uniqueId = `${currentItem.id}-${selectedDrink.id}`;
+                    ShoppingCart.addToCart(uniqueId, selectedDrink.name, selectedDrink.price);
+                }
+
+                hideModal();
+            };
+
+            return { 
+                init,
+                showModal
+            };
+        })();
+
+        // =============================================
+        // MÓDULO DE PAGAMENTO PIX
+        // =============================================
+        const PaymentSystem = (() => {
+            const init = () => {
+                document.getElementById('checkoutBtn').addEventListener('click', handleCheckout);
+                document.getElementById('closeModal').addEventListener('click', hidePaymentModal);
+                document.getElementById('retryPix').addEventListener('click', handleCheckout);
+            };
+
+            const handleCheckout = async () => {
+                if (ShoppingCart.getCartTotal() === 0) {
+                    alert('Seu carrinho está vazio!');
+                    return;
+                }
+
+                showPaymentModal();
+                
+                try {
+                    // Simulação de geração de PIX
+                    setTimeout(() => {
+                        const total = ShoppingCart.getCartTotal();
+                        displayPixDetails({
+                            value: total * 100,
+                            qr_code_image: 'https://via.placeholder.com/150?text=QR+Code',
+                            qr_code: '00020126580014BR.GOV.BCB.PIX0136123e4567-e12b-12d1-a456-4266554400005204000053039865405' + total.toFixed(2) + '5802BR5925BRASA BURGUER LANCHES6009SAO PAULO61080540900062070503***6304' + generateRandomHash()
+                        });
+                    }, 1500);
+                    
+                } catch (error) {
+                    console.error('Erro:', error);
+                    showPaymentError(error.message);
+                }
+            };
+
+            const generateRandomHash = () => {
+                return Math.random().toString(36).substring(2, 10).toUpperCase();
+            };
+
+            const displayPixDetails = (pixData) => {
+                document.getElementById('pixLoading').style.display = 'none';
+                document.getElementById('pixDetails').style.display = 'block';
+                
+                // Formata o valor para exibição (R$ 0,00)
+                const formattedValue = (pixData.value / 100).toLocaleString('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                });
+                
+                document.getElementById('pixAmount').textContent = formattedValue;
+                document.getElementById('pixQrCode').src = pixData.qr_code_image;
+                document.getElementById('pixCopyPaste').textContent = pixData.qr_code;
+                
+                // Configura botão de copiar
+                document.getElementById('copyPixCode').onclick = () => {
+                    navigator.clipboard.writeText(pixData.qr_code)
+                        .then(() => alert('Código PIX copiado!'))
+                        .catch(() => alert('Não foi possível copiar o código.'));
+                };
+
+                // Mostra status e simula confirmação
+                document.getElementById('pixStatus').style.display = 'block';
+                
+                // Simulação de confirmação de pagamento
+                setTimeout(() => {
+                    paymentCompleted();
+                }, 30000);
+            };
+
+            const paymentCompleted = () => {
+                alert('Pagamento confirmado! Seu pedido está sendo preparado.');
+                ShoppingCart.clearCart();
+                hidePaymentModal();
+            };
+
+            const showPaymentModal = () => {
+                document.getElementById('pixLoading').style.display = 'block';
+                document.getElementById('pixDetails').style.display = 'none';
+                document.getElementById('pixError').style.display = 'none';
+                document.getElementById('pixStatus').style.display = 'none';
+                document.getElementById('paymentModal').style.display = 'flex';
+            };
+
+            const hidePaymentModal = () => {
+                document.getElementById('paymentModal').style.display = 'none';
+            };
+
+            const showPaymentError = (errorMessage) => {
+                document.getElementById('pixLoading').style.display = 'none';
+                document.getElementById('pixDetails').style.display = 'none';
+                document.getElementById('pixError').style.display = 'block';
+                document.getElementById('pixError').innerHTML = `
+                    <p>Ocorreu um erro ao gerar o PIX.</p>
+                    <p><strong>Detalhes:</strong> ${errorMessage}</p>
+                    <button class="btn" id="retryPix">Tentar Novamente</button>
+                `;
+                
+                // Reatribui o evento ao novo botão /
+                document.getElementById('retryPix').addEventListener('click', handleCheckout);
+            };
+
+            return { init };
+        })();
     </script>
 </body>
 </html>
