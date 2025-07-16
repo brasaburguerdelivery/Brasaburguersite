@@ -1417,9 +1417,9 @@
 
     <!-- JavaScript -->
     <script>
-        
+        // =============================================
         // MÓDULO PRINCIPAL - APP BRASA BURGUER
-        
+        // =============================================
         document.addEventListener('DOMContentLoaded', () => {
             // Inicializa todos os módulos
             MobileMenu.init();
@@ -1431,9 +1431,9 @@
             PaymentSystem.init();
         });
 
-        
+        // =============================================
         // MÓDULO DE MENU MOBILE
-        
+        // =============================================
         const MobileMenu = (() => {
             const init = () => {
                 const mobileMenuBtn = document.getElementById('mobile-menu');
@@ -1456,9 +1456,9 @@
             return { init };
         })();
 
-        
+        // =============================================
         // MÓDULO DE SCROLL SUAVE
-        
+        // =============================================
         const SmoothScroll = (() => {
             const init = () => {
                 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -1482,9 +1482,9 @@
             return { init };
         })();
 
-        
+        // =============================================
         // MÓDULO DE EFEITOS DO HEADER
-        
+        // =============================================
         const HeaderEffects = (() => {
             const init = () => {
                 window.addEventListener('scroll', () => {
@@ -1498,9 +1498,9 @@
             return { init };
         })();
 
-        
+        // =============================================
         // MÓDULO DE LOCALIZAÇÃO
-        
+        // =============================================
         const LocationService = (() => {
             const init = () => {
                 const locationBtn = document.getElementById('locationBtn');
@@ -1591,9 +1591,9 @@
             return { init };
         })();
 
-        
-        // MÓDULO DO CARRINHO DE COMPRAS //
-        
+        // =============================================
+        // MÓDULO DO CARRINHO DE COMPRAS
+        // =============================================
         const ShoppingCart = (() => {
             let cart = [];
             let currentItem = null;
@@ -1827,9 +1827,9 @@
             };
         })();
 
-        
+        // =============================================
         // MÓDULO DE SELEÇÃO DE BEBIDAS
-
+        // =============================================
         const DrinkSelection = (() => {
             const drinkTypes = {
                 refri: [
