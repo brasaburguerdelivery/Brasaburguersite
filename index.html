@@ -1187,49 +1187,7 @@
                     </div>
                 </div>
                 
-                <!-- Bebidas -->
-                <div class="highlight-card">
-                    <div class="highlight-img">
-                        <img src="images/bebida-2.png" alt="Sucos Naturais">
-                    </div>
-                    <div class="highlight-content">
-                        <h3>Sucos Naturais</h3>
-                        <p>Suco natural feito na hora com frutas frescas (300ml)</p>
-                        <p class="price">R$ 6,00</p>
-                        <button class="btn add-to-cart" data-id="sucos" data-name="Suco Natural" data-price="6.00" data-type="suco">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-
-                <div class="highlight-card">
-                    <div class="highlight-img">
-                        <img src="images/bebida-1.png" alt="Refrigerantes">
-                    </div>
-                    <div class="highlight-content">
-                        <h3>Refrigerantes</h3>
-                        <p>Refrigerante em lata 350ml - diversas opções</p>
-                        <p class="price">R$ 6,00</p>
-                        <button class="btn add-to-cart" data-id="refris" data-name="Refrigerante" data-price="6.00" data-type="refri">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-
-                <div class="highlight-card">
-                    <div class="highlight-img">
-                        <img src="images/bebida-3.png" alt="Água e Energéticos">
-                    </div>
-                    <div class="highlight-content">
-                        <h3>Água e Energéticos</h3>
-                        <p>Água mineral 500ml ou energético 250ml</p>
-                        <p class="price">R$ 5,00</p>
-                        <button class="btn add-to-cart" data-id="aguas" data-name="Água/Energético" data-price="5.00" data-type="energetico">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 40px;">
-                <a href="cardapio.html" class="btn">Ver Cardápio Completo</a>
-            </div>
-        </div>
-    </section>
+                
 
     <!-- Sobre Nós -->
     <section class="section about" id="about">
@@ -1470,9 +1428,6 @@
             SmoothScroll.init();
             HeaderEffects.init();
             LocationService.init();
-            ShoppingCart.init();
-            DrinkSelection.init();
-            PaymentSystem.init();
         });
 
         // =============================================
@@ -1636,409 +1591,34 @@
         })();
 
         // =============================================
-        // MÓDULO DO CARRINHO DE COMPRAS
+        // MÓDULO DE PEDIDOS
         // =============================================
-        const ShoppingCart = (() => {
-            let cart = [];
-            let currentItem = null;
-            let selectedDrink = null;
-
-            const init = () => {
-                loadCart();
-                setupEventListeners();
-                setupCartTooltip();
-            };
-
-            const loadCart = () => {
-                const savedCart = localStorage.getItem('cart');
-                if (savedCart) {
-                    cart = JSON.parse(savedCart);
-                    updateCartUI();
-                }
-            };
-
-            const setupEventListeners = () => {
-                // Carrinho flutuante
-                document.getElementById('cartFloat').addEventListener('click', toggleCart);
-                
-                // Fechar carrinho
-                document.getElementById('closeCart').addEventListener('click', () => {
-                    document.getElementById('cartContainer').style.display = 'none';
-                });
-                
-                // Continuar comprando
-                document.querySelector('.cart-actions .btn:last-child').addEventListener('click', () => {
-                    document.getElementById('cartContainer').style.display = 'none';
-                });
-                
-                // Delegar eventos para os botões "Adicionar ao Carrinho"
-                document.addEventListener('click', function(e) {
-                    if (e.target.classList.contains('add-to-cart')) {
-                        handleAddToCartClick(e.target);
-                    }
+        document.addEventListener('DOMContentLoaded', () => {
+            // Configura os eventos para os botões de pedido
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
                     
-                    // Para botões dentro do elemento .add-to-cart (como ícones)
-                    if (e.target.closest('.add-to-cart')) {
-                        handleAddToCartClick(e.target.closest('.add-to-cart'));
+                    // Obtém o ID do produto
+                    const productId = this.getAttribute('data-id');
+                    
+                    // Redireciona para o checkout correspondente
+                    switch(productId) {
+                        case '1':
+                            window.location.href = 'https://app.pushinpay.com.br/service/pay/9F67C082-6D59-4F40-8630-574657EC28C0';
+                            break;
+                        case '2':
+                            window.location.href = 'https://app.pushinpay.com.br/service/pay/9f67c138-d5a2-4603-b673-8e905d0f1b30';
+                            break;
+                        case '3':
+                            window.location.href = 'https://app.pushinpay.com.br/service/pay/9f67c1c5-4cf7-4f66-90ce-45edae1995b0';
+                            break;
+                        default:
+                            window.location.href = 'https://app.pushinpay.com.br/service/pay/9F67C082-6D59-4F40-8630-574657EC28C0';
                     }
                 });
-            };
-
-            const handleAddToCartClick = function(btn) {
-                const id = btn.getAttribute('data-id');
-                const name = btn.getAttribute('data-name');
-                const price = parseFloat(btn.getAttribute('data-price'));
-                const hasDrink = btn.getAttribute('data-has-drink') === 'true';
-                const drinkType = btn.getAttribute('data-drink-type') || btn.getAttribute('data-type');
-
-                if (hasDrink && drinkType) {
-                    currentItem = { id, name, price, hasDrink: true, drinkType };
-                    DrinkSelection.showModal(currentItem, drinkType);
-                } else if (drinkType) {
-                    currentItem = { id, baseName: name, basePrice: price, type: drinkType };
-                    DrinkSelection.showModal(currentItem, drinkType);
-                } else {
-                    addToCart(id, name, price);
-                }
-            };
-
-            const addToCart = (id, name, price) => {
-                const existingItem = cart.find(item => item.id === id);
-
-                if (existingItem) {
-                    existingItem.quantity++;
-                } else {
-                    cart.push({ id, name, price, quantity: 1 });
-                }
-
-                updateCartUI();
-                saveCart();
-                showCart();
-            };
-
-            const updateCartUI = () => {
-                const cartItems = document.getElementById('cartItems');
-                const cartTotal = document.getElementById('cartTotal');
-                const cartBadge = document.getElementById('cartBadge');
-                
-                cartItems.innerHTML = '';
-                let total = 0;
-
-                cart.forEach(item => {
-                    total += item.price * item.quantity;
-                    
-                    const cartItem = document.createElement('div');
-                    cartItem.className = 'cart-item';
-                    cartItem.innerHTML = `
-                        <div class="cart-item-info">
-                            <h4>${item.name}</h4>
-                            <p>R$ ${item.price.toFixed(2)}</p>
-                        </div>
-                        <div class="cart-item-quantity">
-                            <button class="decrease" data-id="${item.id}">-</button>
-                            <span>${item.quantity}</span>
-                            <button class="increase" data-id="${item.id}">+</button>
-                        </div>
-                        <div class="cart-item-remove" data-id="${item.id}">
-                            <i class="fas fa-trash"></i>
-                        </div>
-                    `;
-                    
-                    cartItems.appendChild(cartItem);
-                });
-
-                // Atualiza totais e badge
-                cartTotal.textContent = `R$ ${total.toFixed(2)}`;
-                cartBadge.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
-
-                // Adiciona eventos aos novos botões
-                setupCartItemEvents();
-            };
-
-            const setupCartItemEvents = () => {
-                document.querySelectorAll('.decrease').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const id = this.getAttribute('data-id');
-                        decreaseQuantity(id);
-                    });
-                });
-
-                document.querySelectorAll('.increase').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const id = this.getAttribute('data-id');
-                        increaseQuantity(id);
-                    });
-                });
-
-                document.querySelectorAll('.cart-item-remove').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const id = this.getAttribute('data-id');
-                        removeFromCart(id);
-                    });
-                });
-            };
-
-            const increaseQuantity = (id) => {
-                const item = cart.find(item => item.id === id);
-                if (item) {
-                    item.quantity++;
-                    updateCartUI();
-                    saveCart();
-                }
-            };
-
-            const decreaseQuantity = (id) => {
-                const item = cart.find(item => item.id === id);
-                if (!item) return;
-
-                if (item.quantity > 1) {
-                    item.quantity--;
-                    updateCartUI();
-                    saveCart();
-                } else {
-                    removeFromCart(id);
-                }
-            };
-
-            const removeFromCart = (id) => {
-                cart = cart.filter(item => item.id !== id);
-                updateCartUI();
-                saveCart();
-                
-                if (cart.length === 0) {
-                    hideCart();
-                }
-            };
-
-            const saveCart = () => {
-                localStorage.setItem('cart', JSON.stringify(cart));
-            };
-
-            const showCart = () => {
-                document.getElementById('cartContainer').style.display = 'block';
-            };
-
-            const hideCart = () => {
-                document.getElementById('cartContainer').style.display = 'none';
-            };
-
-            const toggleCart = () => {
-                if (cart.length > 0) {
-                    showCart();
-                } else {
-                    alert('Seu carrinho está vazio!');
-                }
-            };
-
-            const setupCartTooltip = () => {
-                const cartFloat = document.getElementById('cartFloat');
-                const tooltip = cartFloat.querySelector('.cart-float-tooltip');
-
-                // Mostra tooltip após 2 segundos na primeira vez
-                setTimeout(() => {
-                    tooltip.style.opacity = '1';
-                    setTimeout(() => tooltip.style.opacity = '0', 3000);
-                }, 2000);
-
-                // Mostra tooltip ao passar o mouse
-                cartFloat.addEventListener('mouseenter', () => {
-                    tooltip.style.opacity = '1';
-                });
-
-                cartFloat.addEventListener('mouseleave', () => {
-                    tooltip.style.opacity = '0';
-                });
-            };
-
-            const getCartTotal = () => {
-                return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            };
-
-            const clearCart = () => {
-                cart = [];
-                updateCartUI();
-                saveCart();
-                hideCart();
-            };
-
-            return { 
-                init,
-                getCartTotal,
-                clearCart,
-                currentItem,
-                selectedDrink,
-                addToCart
-            };
-        })();
-
-        // =============================================
-        // MÓDULO DE SELEÇÃO DE BEBIDAS
-        // =============================================
-        const DrinkSelection = (() => {
-            const drinkTypes = {
-                refri: [
-                    { id: 'coca', name: 'Coca-Cola Lata', price: 6.00, icon: '<i class="fas fa-wine-bottle" style="color: #ba172a;"></i>' },
-                    { id: 'guarana', name: 'Guaraná Lata', price: 6.00, icon: '<i class="fas fa-wine-bottle" style="color: #4CAF50;"></i>' },
-                    { id: 'fanta', name: 'Fanta Lata', price: 6.00, icon: '<i class="fas fa-wine-bottle" style="color: #FF9800;"></i>' },
-                    { id: 'sprite', name: 'Sprite Lata', price: 6.00, icon: '<i class="fas fa-wine-bottle" style="color: #00BCD4;"></i>' }
-                ],
-                suco: [
-                    { id: 'laranja', name: 'Suco de Laranja', price: 6.00, icon: '<i class="fas fa-glass-whiskey" style="color: #FF9800;"></i>' },
-                    { id: 'maracuja', name: 'Suco de Maracujá', price: 6.00, icon: '<i class="fas fa-glass-whiskey" style="color: #FFEB3B;"></i>' },
-                    { id: 'limao', name: 'Suco de Limão', price: 6.00, icon: '<i class="fas fa-glass-whiskey" style="color: #CDDC39;"></i>' },
-                    { id: 'abacaxi', name: 'Suco de Abacaxi', price: 6.00, icon: '<i class="fas fa-glass-whiskey" style="color: #FFC107;"></i>' }
-                ],
-                energetico: [
-                    { id: 'redbull', name: 'Red Bull 250ml', price: 8.00, icon: '<i class="fas fa-bolt" style="color: #0055A4;"></i>' },
-                    { id: 'monster', name: 'Monster Energy 250ml', price: 8.00, icon: '<i class="fas fa-bolt" style="color: #4CAF50;"></i>' },
-                    { id: 'agua', name: 'Água Mineral 500ml', price: 5.00, icon: '<i class="fas fa-tint" style="color: #2196F3;"></i>' }
-                ]
-            };
-
-            const init = () => {
-                document.getElementById('closeDrinkModal').addEventListener('click', hideModal);
-                document.getElementById('cancelDrink').addEventListener('click', hideModal);
-                document.getElementById('confirmDrink').addEventListener('click', confirmSelection);
-            };
-
-            const showModal = (item, drinkType) => {
-                document.getElementById('drinkModalTitle').textContent = getTitleForDrinkType(drinkType);
-                renderDrinkOptions(drinkType);
-                document.getElementById('drinkModal').style.display = 'flex';
-                ShoppingCart.currentItem = item;
-            };
-
-            const hideModal = () => {
-                document.getElementById('drinkModal').style.display = 'none';
-                ShoppingCart.currentItem = null;
-                ShoppingCart.selectedDrink = null;
-            };
-
-            const getTitleForDrinkType = (drinkType) => {
-                switch(drinkType) {
-                    case 'refri': return 'Selecione seu refrigerante';
-                    case 'suco': return 'Selecione seu suco';
-                    default: return 'Selecione sua bebida';
-                }
-            };
-
-            const renderDrinkOptions = (drinkType) => {
-                const drinkOptions = document.getElementById('drinkOptions');
-                drinkOptions.innerHTML = '';
-
-                drinkTypes[drinkType].forEach(drink => {
-                    const option = document.createElement('div');
-                    option.className = 'drink-option';
-                    option.dataset.id = drink.id;
-                    option.innerHTML = `
-                        <div style="width: 30px; text-align: center; margin-right: 10px;">
-                            ${drink.icon}
-                        </div>
-                        <div>
-                            <div>${drink.name}</div>
-                            <div style="font-size: 0.9rem; color: #ba172a;">R$ ${drink.price.toFixed(2)}</div>
-                        </div>
-                    `;
-                    
-                    option.addEventListener('click', () => selectDrink(option, drink));
-                    drinkOptions.appendChild(option);
-                });
-            };
-
-            const selectDrink = (optionElement, drink) => {
-                document.querySelectorAll('.drink-option').forEach(opt => {
-                    opt.classList.remove('active');
-                });
-                optionElement.classList.add('active');
-                ShoppingCart.selectedDrink = drink;
-            };
-
-            const confirmSelection = () => {
-                if (!ShoppingCart.selectedDrink) {
-                    alert('Por favor, selecione uma bebida');
-                    return;
-                }
-
-                const { currentItem, selectedDrink } = ShoppingCart;
-                
-                if (currentItem.hasDrink) {
-                    const itemName = `${currentItem.name} (${selectedDrink.name})`;
-                    ShoppingCart.addToCart(currentItem.id, itemName, currentItem.price);
-                } else {
-                    const uniqueId = `${currentItem.id}-${selectedDrink.id}`;
-                    ShoppingCart.addToCart(uniqueId, selectedDrink.name, selectedDrink.price);
-                }
-
-                hideModal();
-            };
-
-            return { 
-                init,
-                showModal
-            };
-        })();
-
-        // =============================================
-        // MÓDULO DE PAGAMENTO PIX
-        // =============================================
-const PaymentSystem = (() => {
-    const API_URL = 'http://localhost:3000/api/create-payment-intent'; // Ou sua URL de produção
-    
-    const init = () => {
-        document.getElementById('checkoutBtn').addEventListener('click', handleCheckout);
-        document.getElementById('closeModal').addEventListener('click', hidePaymentModal);
-        document.getElementById('retryPix').addEventListener('click', handleCheckout);
-    };
-
-    const handleCheckout = async () => {
-        if (ShoppingCart.getCartTotal() === 0) {
-            alert('Seu carrinho está vazio!');
-            return;
-        }
-
-        try {
-            const total = ShoppingCart.getCartTotal();
-            const response = await createPaymentIntent(total);
-            
-            // Redirecionar para página de checkout do Stripe
-            const stripe = Stripe('pk_test_sua_chave_publica_do_stripe');
-            const { error } = await stripe.redirectToCheckout({
-                sessionId: response.sessionId
             });
-            
-            if (error) {
-                throw error;
-            }
-        } catch (error) {
-            console.error('Erro:', error);
-            alert('Erro ao processar pagamento: ' + error.message);
-        }
-    };
-
-    const createPaymentIntent = async (amount) => {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                amount,
-                currency: 'brl',
-                metadata: {
-                    cartItems: JSON.stringify(ShoppingCart.getCartItems())
-                }
-            })
         });
-
-        if (!response.ok) {
-            throw new Error('Erro ao criar intenção de pagamento');
-        }
-
-        return await response.json();
-    };
-
-    return { init };
-})();
     </script>
 </body>
 </html>
