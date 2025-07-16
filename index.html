@@ -1696,7 +1696,8 @@ const ShoppingCart = (() => {
         init,
         addToCart,
         currentItem,
-        selectedDrink
+        selectedDrink,
+        showAddressModal 
     };
 })();
 
@@ -1955,29 +1956,29 @@ const DrinkSelection = (() => {
     };
 
     const confirmSelection = () => {
-        if (!ShoppingCart.selectedDrink) {
-            alert('Por favor, selecione uma bebida');
-            return;
-        }
+    if (!ShoppingCart.selectedDrink) {
+        alert('Por favor, selecione uma bebida');
+        return;
+    }
 
-        const { currentItem, selectedDrink } = ShoppingCart;
-        
-        // Adiciona o combo com a bebida selecionada
-        const itemName = `${currentItem.name} (${selectedDrink.name})`;
-        const totalPrice = currentItem.price + selectedDrink.price;
-        
-        // Define o item atual antes de mostrar o modal de endereço
-        ShoppingCart.currentItem = {
-            id: `${currentItem.id}-${selectedDrink.id}`,
-            name: itemName,
-            price: totalPrice
-        };
-        
-        // Esconde o modal de bebidas e mostra o de endereço
-        hideModal();
-        ShoppingCart.showAddressModal();
+    const { currentItem, selectedDrink } = ShoppingCart;
+    
+    // Adiciona o combo com a bebida selecionada
+    const itemName = `${currentItem.name} (${selectedDrink.name})`;
+    const totalPrice = currentItem.price + selectedDrink.price;
+    
+    // Define o item atual antes de mostrar o modal de endereço
+    ShoppingCart.currentItem = {
+        id: `${currentItem.id}-${selectedDrink.id}`,
+        name: itemName,
+        price: totalPrice,
+        hasDrink: false // Marcamos como false pois já incluímos a bebida no nome e preço
     };
-
+    
+    // Esconde o modal de bebidas e mostra o de endereço
+    hideModal();
+    ShoppingCart.showAddressModal();
+};
     // Exporta as funções públicas
     return {
         init,
