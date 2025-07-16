@@ -1875,7 +1875,7 @@ const ShoppingCart = (() => {
         })();
         
         // =============================================
-// MÓDULO DE SELEÇÃO DE BEBIDAS
+// MÓDULO DE SELEÇÃO DE BEBIDAS (CORRIGIDO)
 // =============================================
 const DrinkSelection = (() => {
     const drinkTypes = {
@@ -1976,6 +1976,13 @@ const DrinkSelection = (() => {
         // Esconde o modal de bebidas e mostra o de endereço
         hideModal();
         ShoppingCart.showAddressModal();
+    };
+
+    // Exporta as funções públicas
+    return {
+        init,
+        showModal,
+        hideModal
     };
 })();
     </script>
