@@ -1185,51 +1185,7 @@
                         <p class="price">R$ 49,90</p>
                         <button class="btn add-to-cart" data-id="3" data-name="Combo Brasa Supremo" data-price="49.90">Adicionar ao Carrinho</button>
                     </div>
-                </div>
-                
-                <!-- Bebidas -->
-                <div class="highlight-card">
-                    <div class="highlight-img">
-                        <img src="images/bebida-2.png" alt="Sucos Naturais">
-                    </div>
-                    <div class="highlight-content">
-                        <h3>Sucos Naturais</h3>
-                        <p>Suco natural feito na hora com frutas frescas (300ml)</p>
-                        <p class="price">R$ 6,00</p>
-                        <button class="btn add-to-cart" data-id="sucos" data-name="Suco Natural" data-price="6.00" data-type="suco">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-
-                <div class="highlight-card">
-                    <div class="highlight-img">
-                        <img src="images/bebida-1.png" alt="Refrigerantes">
-                    </div>
-                    <div class="highlight-content">
-                        <h3>Refrigerantes</h3>
-                        <p>Refrigerante em lata 350ml - diversas opções</p>
-                        <p class="price">R$ 6,00</p>
-                        <button class="btn add-to-cart" data-id="refris" data-name="Refrigerante" data-price="6.00" data-type="refri">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-
-                <div class="highlight-card">
-                    <div class="highlight-img">
-                        <img src="images/bebida-3.png" alt="Água e Energéticos">
-                    </div>
-                    <div class="highlight-content">
-                        <h3>Água e Energéticos</h3>
-                        <p>Água mineral 500ml ou energético 250ml</p>
-                        <p class="price">R$ 5,00</p>
-                        <button class="btn add-to-cart" data-id="aguas" data-name="Água/Energético" data-price="5.00" data-type="energetico">Adicionar ao Carrinho</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 40px;">
-                <a href="cardapio.html" class="btn">Ver Cardápio Completo</a>
-            </div>
-        </div>
-    </section>
+                </div>                               
 
     <!-- Sobre Nós -->
     <section class="section about" id="about">
@@ -1461,9 +1417,9 @@
 
     <!-- JavaScript -->
     <script>
-        // =============================================
+        
         // MÓDULO PRINCIPAL - APP BRASA BURGUER
-        // =============================================
+        
         document.addEventListener('DOMContentLoaded', () => {
             // Inicializa todos os módulos
             MobileMenu.init();
@@ -1475,9 +1431,9 @@
             PaymentSystem.init();
         });
 
-        // =============================================
+        
         // MÓDULO DE MENU MOBILE
-        // =============================================
+        
         const MobileMenu = (() => {
             const init = () => {
                 const mobileMenuBtn = document.getElementById('mobile-menu');
@@ -1500,9 +1456,9 @@
             return { init };
         })();
 
-        // =============================================
+        
         // MÓDULO DE SCROLL SUAVE
-        // =============================================
+        
         const SmoothScroll = (() => {
             const init = () => {
                 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -1526,9 +1482,9 @@
             return { init };
         })();
 
-        // =============================================
+        
         // MÓDULO DE EFEITOS DO HEADER
-        // =============================================
+        
         const HeaderEffects = (() => {
             const init = () => {
                 window.addEventListener('scroll', () => {
@@ -1542,9 +1498,9 @@
             return { init };
         })();
 
-        // =============================================
+        
         // MÓDULO DE LOCALIZAÇÃO
-        // =============================================
+        
         const LocationService = (() => {
             const init = () => {
                 const locationBtn = document.getElementById('locationBtn');
@@ -1635,9 +1591,9 @@
             return { init };
         })();
 
-        // =============================================
-        // MÓDULO DO CARRINHO DE COMPRAS
-        // =============================================
+        
+        // MÓDULO DO CARRINHO DE COMPRAS //
+        
         const ShoppingCart = (() => {
             let cart = [];
             let currentItem = null;
@@ -1871,9 +1827,9 @@
             };
         })();
 
-        // =============================================
+        
         // MÓDULO DE SELEÇÃO DE BEBIDAS
-        // =============================================
+
         const DrinkSelection = (() => {
             const drinkTypes = {
                 refri: [
@@ -1978,199 +1934,7 @@
             };
         })();
 
-        // =============================================
-// MÓDULO DE PAGAMENTO PIX
-// =============================================
-const PaymentSystem = (() => {
-    const API_URL = 'gerar-pix.php'; // Endpoint para gerar o PIX
-    let paymentCheckInterval = null;
-
-    const init = () => {
-        document.getElementById('checkoutBtn').addEventListener('click', handleCheckout);
-        document.getElementById('closeModal').addEventListener('click', hidePaymentModal);
-        document.getElementById('retryPix').addEventListener('click', handleCheckout);
-    };
-
-    const handleCheckout = async () => {
-        if (ShoppingCart.getCartTotal() === 0) {
-            alert('Seu carrinho está vazio!');
-            return;
-        }
-
-        showPaymentModal();
         
-        try {
-            const total = ShoppingCart.getCartTotal();
-            const response = await generatePix(total);
-            
-            if (response.success) {
-                displayPixDetails(response.data);
-                startPaymentCheck(response.data.transaction_id);
-            } else {
-                throw new Error(response.message || 'Erro ao gerar PIX');
-            }
-        } catch (error) {
-            console.error('Erro:', error);
-            showPaymentError(error.message);
-        }
-    };
-
-    const generatePix = async (amount) => {
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    value: amount * 100, // Converter para centavos
-                    webhook_url: window.location.href,
-                    split_rules: []
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Erro na requisição');
-            }
-
-            return await response.json();
-        } catch (error) {
-            // Se a API falhar, usamos dados simulados para demonstração
-            console.warn('Usando dados simulados - API falhou:', error);
-            return {
-                success: true,
-                data: {
-                    value: amount * 100,
-                    qr_code_image: 'https://via.placeholder.com/150?text=QR+Code',
-                    qr_code: '00020126580014BR.GOV.BCB.PIX0136123e4567-e12b-12d1-a456-4266554400005204000053039865405' + amount.toFixed(2) + '5802BR5925BRASA BURGUER LANCHES6009SAO PAULO61080540900062070503***6304' + generateRandomHash(),
-                    transaction_id: 'sim_' + generateRandomHash()
-                }
-            };
-        }
-    };
-
-    
-    const startPaymentTimer = () => {
-    let seconds = 1800; // 30 minutos
-    const timerElement = document.getElementById('timerValue');
-    
-    const timerInterval = setInterval(() => {
-        seconds--;
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        timerElement.textContent = `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-        
-        if (seconds <= 0) {
-            clearInterval(timerInterval);
-            showPaymentError('Tempo para pagamento expirado. Por favor, inicie um novo pedido.');
-        }
-    }, 1000);
-    
-    return timerInterval;
-};
-
-    const startPaymentCheck = (transactionId) => {
-        // Limpar qualquer verificação anterior
-        if (paymentCheckInterval) clearInterval(paymentCheckInterval);
-        
-        // Verificar pagamento a cada 5 segundos (simulado)
-        paymentCheckInterval = setInterval(() => {
-            checkPaymentStatus(transactionId);
-        }, 5000);
-    };
-
-    const checkPaymentStatus = async (transactionId) => {
-        // Em produção, você faria uma requisição para verificar o status
-        // Aqui estamos simulando que o pagamento foi confirmado após 30 segundos
-        if (transactionId.startsWith('sim_')) {
-            // Simulação - 30% de chance de pagamento confirmado após 5 segundos
-            if (Math.random() < 0.3) {
-                paymentCompleted();
-            }
-        } else {
-            // Implementação real verificaria o status na API
-            try {
-                const response = await fetch(`gerar-pix.php?transaction_id=${transactionId}`);
-                const data = await response.json();
-                
-                if (data.status === 'paid') {
-                    paymentCompleted();
-                }
-            } catch (error) {
-                console.error('Erro ao verificar pagamento:', error);
-            }
-        }
-    };
-
-    const generateRandomHash = () => {
-        return Math.random().toString(36).substring(2, 10).toUpperCase();
-    };
-
-    const displayPixDetails = (pixData) => {
-        document.getElementById('pixLoading').style.display = 'none';
-        document.getElementById('pixDetails').style.display = 'block';
-        
-        // Formata o valor para exibição (R$ 0,00)
-        const formattedValue = (pixData.value / 100).toLocaleString('pt-BR', {
-            style: 'currency',
-            currency: 'BRL'
-        });
-        
-        document.getElementById('pixAmount').textContent = formattedValue;
-        document.getElementById('pixQrCode').src = pixData.qr_code_image;
-        document.getElementById('pixCopyPaste').textContent = pixData.qr_code;
-        
-        // Configura botão de copiar
-        document.getElementById('copyPixCode').onclick = () => {
-            navigator.clipboard.writeText(pixData.qr_code)
-                .then(() => alert('Código PIX copiado!'))
-                .catch(() => alert('Não foi possível copiar o código.'));
-        };
-
-        // Mostra status e inicia verificação
-        document.getElementById('pixStatus').style.display = 'block';
-    };
-
-    const paymentCompleted = () => {
-        if (paymentCheckInterval) clearInterval(paymentCheckInterval);
-        
-        alert('Pagamento confirmado! Seu pedido está sendo preparado.');
-        ShoppingCart.clearCart();
-        hidePaymentModal();
-        
-        // Redireciona para página de confirmação (opcional)
-        // window.location.href = 'pedido-confirmado.html';
-    };
-
-    const showPaymentModal = () => {
-        document.getElementById('pixLoading').style.display = 'block';
-        document.getElementById('pixDetails').style.display = 'none';
-        document.getElementById('pixError').style.display = 'none';
-        document.getElementById('pixStatus').style.display = 'none';
-        document.getElementById('paymentModal').style.display = 'flex';
-    };
-
-    const hidePaymentModal = () => {
-        if (paymentCheckInterval) clearInterval(paymentCheckInterval);
-        document.getElementById('paymentModal').style.display = 'none';
-    };
-
-    const showPaymentError = (errorMessage) => {
-        document.getElementById('pixLoading').style.display = 'none';
-        document.getElementById('pixDetails').style.display = 'none';
-        document.getElementById('pixError').style.display = 'block';
-        document.getElementById('pixError').innerHTML = `
-            <p>Ocorreu um erro ao gerar o PIX.</p>
-            <p><strong>Detalhes:</strong> ${errorMessage}</p>
-            <button class="btn" id="retryPix">Tentar Novamente</button>
-        `;
-        
-        // Reatribui o evento ao novo botão
-        document.getElementById('retryPix').addEventListener('click', handleCheckout);
-    };
-
-    return { init };
-})();
     </script>
 </body>
 </html>
