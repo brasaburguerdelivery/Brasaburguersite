@@ -1633,9 +1633,25 @@ const ShoppingCart = (() => {
             reference
         };
 
-        // Agora adiciona o item ao carrinho
-        addToCart(currentItem.id, currentItem.name, currentItem.price);
+        // Redireciona para o checkout apropriado
+        redirectToCheckout();
         hideAddressModal();
+    };
+
+    const redirectToCheckout = () => {
+        // Mapeia os IDs dos produtos para os links de checkout
+        const checkoutLinks = {
+            '1': 'https://app.pushinpay.com.br/service/pay/9F67C082-6D59-4F40-8630-574657EC28C0', // Combo na Brasa
+            '2': 'https://app.pushinpay.com.br/service/pay/9f67c138-d5a2-4603-b673-8e905d0f1b30', // Combo Selvagem
+            '3': 'https://app.pushinpay.com.br/service/pay/9f67c1c5-4cf7-4f66-90ce-45edae1995b0'  // Combo Brasa Supremo
+        };
+
+        // Verifica se o item atual tem um link de checkout correspondente
+        if (currentItem && checkoutLinks[currentItem.id]) {
+            window.location.href = checkoutLinks[currentItem.id];
+        } else {
+            alert('Produto não encontrado. Por favor, tente novamente.');
+        }
     };
 
     const addToCart = (id, name, price) => {
