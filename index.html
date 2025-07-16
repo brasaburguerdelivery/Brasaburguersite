@@ -1633,11 +1633,8 @@ const ShoppingCart = (() => {
         reference
     };
 
-    // Pega apenas o ID base do item (remove parte da bebida se existir)
-    const baseItemId = ShoppingCart.currentItem.id.split('-')[0];
-    
     // Redireciona para o checkout correspondente
-    redirectToCheckout(baseItemId);
+    redirectToCheckout(currentItem.id);
     hideAddressModal();
 };
 
@@ -1648,8 +1645,11 @@ const redirectToCheckout = (itemId) => {
         '3': 'https://app.pushinpay.com.br/service/pay/9f67c1c5-4cf7-4f66-90ce-45edae1995b0' // Combo Brasa Supremo
     };
 
-    if (checkoutUrls[itemId]) {
-        window.location.href = checkoutUrls[itemId];
+    // Para combos com bebidas, removemos a parte após o hífen (id da bebida)
+    const baseItemId = itemId.split('-')[0];
+    
+    if (checkoutUrls[baseItemId]) {
+        window.location.href = checkoutUrls[baseItemId];
     } else {
         alert('Checkout não disponível para este item');
     }
@@ -1932,7 +1932,7 @@ const DrinkSelection = (() => {
     
     // Define o item atual antes de mostrar o modal de endereço
     ShoppingCart.currentItem = {
-        id: `${currentItem.id}-${selectedDrink.id}`, // Inclui o ID da bebida
+        id: `${currentItem.id}-${selectedDrink.id}`,
         name: itemName,
         price: totalPrice,
         hasDrink: false // Marcamos como false pois já incluímos a bebida no nome e preço
